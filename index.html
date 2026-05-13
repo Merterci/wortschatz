@@ -36,6 +36,10 @@ function registerFonts(doc) {
     --accent: #c0392b;
     --accent2: #8b6914;
     --verb-accent: #2e6b3f;
+    --adj-accent: #7d3c98;
+    --der-color: #2563eb;
+    --die-color: #dc2626;
+    --das-color: #16a34a;
     --line: #d4c8a8;
     --sidebar: #2b1f0e;
     --sidebar-text: #f5ead6;
@@ -223,6 +227,7 @@ function registerFonts(doc) {
   }
   .day-count-pill.words { background: rgba(192,57,43,0.25); color: #f5b8a8; }
   .day-count-pill.verbs { background: rgba(46,107,63,0.3); color: #a8e0b8; }
+  .day-count-pill.adj { background: rgba(125,60,152,0.3); color: #d8b8e8; }
 
   .sidebar-footer {
     padding: 12px 14px 16px;
@@ -874,6 +879,267 @@ function registerFonts(doc) {
     .btn-edit { grid-area: edit; align-self: center; }
     .btn-del { grid-area: del; align-self: center; }
   }
+
+  body.adj-mode .field-input.de { color: var(--adj-accent); }
+  body.adj-mode .field-input:focus { border-color: var(--adj-accent); }
+  body.adj-mode .field-input.de::placeholder { color: #d0bfdb; }
+  body.adj-mode .btn-primary:hover { background: var(--adj-accent); }
+  body.adj-mode .word-de { color: var(--adj-accent); }
+  body.adj-mode .empty-state .big { color: var(--adj-accent); }
+  body.adj-mode .practice-progress-fill { background: var(--adj-accent); }
+  body.adj-mode .card-question { color: var(--adj-accent); }
+  .nav-btn.active.adj { background: var(--adj-accent); }
+  .mode-badge.adj { background: var(--adj-accent); }
+
+  /* Artikel highlight inside word-de */
+  .artikel-der { color: var(--der-color); font-weight: 700; }
+  .artikel-die { color: var(--die-color); font-weight: 700; }
+  .artikel-das { color: var(--das-color); font-weight: 700; }
+
+  /* Clickable word row */
+  .word-row { cursor: pointer; }
+  .word-row .btn-edit, .word-row .btn-del { cursor: pointer; }
+
+  /* ─── DETAIL MODAL ─── */
+  .detail-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(43,31,14,0.65);
+    backdrop-filter: blur(6px);
+    z-index: 150;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    overflow-y: auto;
+  }
+  .detail-modal.show { display: flex; }
+
+  .detail-card {
+    background: var(--paper);
+    border-radius: 18px;
+    padding: 36px 42px;
+    max-width: 720px;
+    width: 100%;
+    max-height: 92vh;
+    overflow-y: auto;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.4);
+    border: 1px solid var(--line);
+    position: relative;
+    animation: detail-pop 0.22s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  @keyframes detail-pop {
+    from { opacity: 0; transform: scale(0.92) translateY(8px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  .detail-close {
+    position: absolute; top: 14px; right: 16px;
+    background: none; border: none; cursor: pointer;
+    font-size: 22px; color: #b09a7a; padding: 8px 10px; border-radius: 8px;
+    line-height: 1; transition: all 0.12s;
+  }
+  .detail-close:hover { background: var(--hover); color: var(--accent); }
+
+  .detail-mode-tag {
+    display: inline-block;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 99px;
+    color: white;
+    background: var(--accent);
+    margin-bottom: 18px;
+    font-weight: 700;
+  }
+  .detail-mode-tag.verbs { background: var(--verb-accent); }
+  .detail-mode-tag.adj { background: var(--adj-accent); }
+
+  .detail-de {
+    font-family: 'Caveat', cursive;
+    font-size: 56px;
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1.05;
+    margin-bottom: 8px;
+    word-break: break-word;
+  }
+  body.verbs-mode .detail-de { color: var(--verb-accent); }
+  body.adj-mode .detail-de { color: var(--adj-accent); }
+
+  .detail-tr {
+    font-family: 'Caveat', cursive;
+    font-size: 34px;
+    color: var(--accent2);
+    margin-bottom: 24px;
+    word-break: break-word;
+  }
+
+  .detail-section {
+    margin-bottom: 18px;
+    padding-top: 18px;
+    border-top: 1px solid var(--line);
+  }
+  .detail-section:first-of-type { border-top: none; padding-top: 0; }
+  .detail-section-label {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #9a8870;
+    margin-bottom: 8px;
+  }
+  .detail-ex-de {
+    font-family: 'Caveat', cursive;
+    font-size: 22px;
+    color: var(--ink);
+    line-height: 1.35;
+    font-style: italic;
+    word-break: break-word;
+  }
+  .detail-ex-tr {
+    font-family: 'Caveat', cursive;
+    font-size: 19px;
+    color: var(--accent2);
+    margin-top: 4px;
+    line-height: 1.35;
+    word-break: break-word;
+  }
+
+  .detail-syn {
+    display: flex; flex-wrap: wrap; gap: 8px;
+  }
+  .syn-pill {
+    background: var(--hover);
+    border: 1px solid var(--line);
+    padding: 6px 14px;
+    border-radius: 99px;
+    font-family: 'Caveat', cursive;
+    font-size: 18px;
+    color: var(--ink2);
+    font-weight: 600;
+  }
+
+  .detail-cats {
+    display: flex; flex-wrap: wrap; gap: 6px;
+  }
+  .cat-pill {
+    background: var(--tag-bg);
+    color: #6b5530;
+    padding: 4px 12px;
+    border-radius: 99px;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    border: 1px solid #d4c5a5;
+  }
+
+  .detail-mastery-row {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 18px;
+    background: var(--entry-bg);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+  }
+  .detail-mastery-label {
+    font-size: 11px;
+    letter-spacing: 1px;
+    color: #9a8870;
+    text-transform: uppercase;
+  }
+  .detail-mastery-dots {
+    display: flex; gap: 5px;
+  }
+  .detail-mastery-dots .dot {
+    width: 12px; height: 12px;
+  }
+  .detail-stats {
+    margin-left: auto;
+    font-size: 11px;
+    color: #9a8870;
+  }
+  .detail-stats strong {
+    color: var(--ink);
+    font-family: 'Caveat', cursive;
+    font-size: 17px;
+  }
+
+  .detail-actions {
+    margin-top: 24px;
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+  }
+
+  /* Categories input with autocomplete */
+  .cats-input-wrap { position: relative; }
+  .cat-tags-row {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    padding: 8px 10px;
+    border: 1.5px solid var(--line);
+    border-radius: 8px;
+    background: var(--paper);
+    min-height: 42px;
+    cursor: text;
+  }
+  .cat-tags-row .cat-pill {
+    cursor: pointer;
+    display: inline-flex; align-items: center; gap: 4px;
+  }
+  .cat-tags-row .cat-pill .x { font-weight: bold; color: #b09a7a; }
+  .cat-tags-row input {
+    border: none; outline: none; background: transparent;
+    flex: 1; min-width: 80px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--ink);
+  }
+  .cat-suggestions {
+    position: absolute;
+    top: 100%; left: 0; right: 0;
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    box-shadow: 0 4px 16px var(--shadow);
+    z-index: 10;
+    max-height: 200px;
+    overflow-y: auto;
+    margin-top: 4px;
+  }
+  .cat-suggestion-item {
+    padding: 8px 14px;
+    cursor: pointer;
+    font-size: 12px;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .cat-suggestion-item:hover, .cat-suggestion-item.active { background: var(--hover); }
+  .cat-suggestion-item .icon { font-size: 14px; }
+  .cat-suggestion-item .meta { margin-left: auto; font-size: 9px; color: #9a8870; }
+
+  /* Filter chip bar */
+  .cat-filter-bar {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    margin: 8px 0 16px;
+  }
+  .cat-filter-chip {
+    background: var(--entry-bg);
+    border: 1px solid var(--line);
+    padding: 5px 12px;
+    border-radius: 99px;
+    font-size: 10px;
+    letter-spacing: 0.5px;
+    color: #6b5530;
+    cursor: pointer;
+    transition: all 0.12s;
+  }
+  .cat-filter-chip:hover { background: var(--hover); }
+  .cat-filter-chip.active {
+    background: var(--ink);
+    color: var(--paper);
+    border-color: var(--ink);
+  }
 </style>
   <!-- Firebase -->
   <script type="module">
@@ -962,8 +1228,10 @@ function registerFonts(doc) {
 
         const localWords = localStorage.getItem('wortschatz_words_v3');
         const localVerbs = localStorage.getItem('wortschatz_verbs_v3');
+        const localAdj   = localStorage.getItem('wortschatz_adj_v3');
         const cloudWords = JSON.stringify(data.words || {});
         const cloudVerbs = JSON.stringify(data.verbs || {});
+        const cloudAdj   = JSON.stringify(data.adj   || {});
 
         let changed = false;
 
@@ -975,6 +1243,10 @@ function registerFonts(doc) {
         }
         if (cloudVerbs !== localVerbs) {
           localStorage.setItem('wortschatz_verbs_v3', cloudVerbs);
+          changed = true;
+        }
+        if (cloudAdj !== localAdj) {
+          localStorage.setItem('wortschatz_adj_v3', cloudAdj);
           changed = true;
         }
         writingFromCloud = false;
@@ -998,6 +1270,7 @@ function registerFonts(doc) {
         await setDoc(ref, {
           words: JSON.parse(localStorage.getItem('wortschatz_words_v3') || '{}'),
           verbs: JSON.parse(localStorage.getItem('wortschatz_verbs_v3') || '{}'),
+          adj:   JSON.parse(localStorage.getItem('wortschatz_adj_v3')   || '{}'),
           updatedAt: serverTimestamp()
         });
         syncEl.textContent = '✓ Synced';
@@ -1014,7 +1287,7 @@ function registerFonts(doc) {
     localStorage.setItem = function(key, val) {
       _origSetItem(key, val);
       if (!writingFromCloud &&
-          (key === 'wortschatz_words_v3' || key === 'wortschatz_verbs_v3')) {
+          (key === 'wortschatz_words_v3' || key === 'wortschatz_verbs_v3' || key === 'wortschatz_adj_v3')) {
         clearTimeout(syncTimeout);
         syncTimeout = setTimeout(() => window.pushToCloud(), 1500);
       }
@@ -1038,6 +1311,9 @@ function registerFonts(doc) {
       </button>
       <button class="nav-btn" data-view="verbs" onclick="switchView('verbs')">
         <span class="nav-icon">⚡</span> Verbs
+      </button>
+      <button class="nav-btn" data-view="adj" onclick="switchView('adj')">
+        <span class="nav-icon">◇</span> Adjectives
       </button>
       <button class="nav-btn" data-view="practice" onclick="switchView('practice')">
         <span class="nav-icon">◎</span> Practice
@@ -1107,9 +1383,10 @@ function registerFonts(doc) {
     <div class="setup-section">
       <div class="setup-label">Content</div>
       <div class="option-grid" id="export-content">
-        <div class="option-btn selected" data-val="both">Words + Verbs</div>
+        <div class="option-btn selected" data-val="all">All (Words + Verbs + Adj)</div>
         <div class="option-btn" data-val="words">Words only</div>
         <div class="option-btn" data-val="verbs">Verbs only</div>
+        <div class="option-btn" data-val="adj">Adjectives only</div>
         <div class="option-btn" data-val="current">Current view</div>
       </div>
     </div>
@@ -1147,7 +1424,7 @@ function registerFonts(doc) {
 
 <!-- EDIT MODAL -->
 <div class="modal-backdrop" id="edit-modal">
-  <div class="modal" style="max-width:560px;">
+  <div class="modal" style="max-width:640px;">
     <h3 id="edit-modal-title">Edit Word</h3>
     <p>Update the fields below and save your changes.</p>
 
@@ -1170,6 +1447,23 @@ function registerFonts(doc) {
       </div>
     </div>
 
+    <div class="field-group" style="margin-top:14px;">
+      <span class="field-label">Synonyms (eş anlamlılar, comma-separated)</span>
+      <input id="edit-syn" class="field-input" autocomplete="off"
+             placeholder="z.B. hübsch, attraktiv, reizend"
+             style="font-size:16px;">
+    </div>
+
+    <div class="field-group" style="margin-top:14px;">
+      <span class="field-label">Categories</span>
+      <div class="cats-input-wrap">
+        <div class="cat-tags-row" id="edit-cat-row" onclick="document.getElementById('edit-cat-input').focus()">
+          <input id="edit-cat-input" type="text" placeholder="Type or pick from suggestions..." autocomplete="off">
+        </div>
+        <div class="cat-suggestions" id="edit-cat-suggestions" style="display:none;"></div>
+      </div>
+    </div>
+
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeEditModal()">Cancel</button>
       <button class="btn btn-primary" onclick="saveEdit()">Save Changes</button>
@@ -1185,9 +1479,35 @@ function registerFonts(doc) {
 // ═══════════════════════════════════════════════════════════════
 const STORE_WORDS = 'wortschatz_words_v3';
 const STORE_VERBS = 'wortschatz_verbs_v3';
-let currentView = 'words'; // 'words' | 'verbs' | 'practice'
+const STORE_ADJ   = 'wortschatz_adj_v3';
+let currentView = 'words'; // 'words' | 'verbs' | 'adj' | 'practice'
 let searchTerm = '';
 let dayFilter = 'all'; // 'today' | 'week' | 'all'
+let categoryFilter = null; // category slug or null
+
+// Preset categories with icons + German labels
+const PRESET_CATEGORIES = [
+  { slug: 'musik',       de: 'Musik',         tr: 'Müzik',          icon: '♪' },
+  { slug: 'emotionen',   de: 'Emotionen',     tr: 'Duygular',       icon: '♥' },
+  { slug: 'essen',       de: 'Essen',         tr: 'Yemek',          icon: '☕' },
+  { slug: 'familie',     de: 'Familie',       tr: 'Aile',           icon: '☺' },
+  { slug: 'natur',       de: 'Natur',         tr: 'Doğa',           icon: '✿' },
+  { slug: 'wetter',      de: 'Wetter',        tr: 'Hava',           icon: '☀' },
+  { slug: 'arbeit',      de: 'Arbeit',        tr: 'İş',             icon: '⚙' },
+  { slug: 'schule',      de: 'Schule',        tr: 'Okul',           icon: '✎' },
+  { slug: 'reisen',      de: 'Reisen',        tr: 'Seyahat',        icon: '✈' },
+  { slug: 'verkehr',     de: 'Verkehr',       tr: 'Ulaşım',         icon: '⊙' },
+  { slug: 'koerper',     de: 'Körper',        tr: 'Vücut',          icon: '✋' },
+  { slug: 'gesundheit',  de: 'Gesundheit',    tr: 'Sağlık',         icon: '✚' },
+  { slug: 'kleidung',    de: 'Kleidung',      tr: 'Giysi',          icon: '◈' },
+  { slug: 'haus',        de: 'Haus & Wohnung',tr: 'Ev',             icon: '⌂' },
+  { slug: 'tiere',       de: 'Tiere',         tr: 'Hayvanlar',      icon: '◐' },
+  { slug: 'sport',       de: 'Sport',         tr: 'Spor',           icon: '◯' },
+  { slug: 'farben',      de: 'Farben',        tr: 'Renkler',        icon: '◆' },
+  { slug: 'zeit',        de: 'Zeit',          tr: 'Zaman',          icon: '◷' },
+  { slug: 'technologie', de: 'Technologie',   tr: 'Teknoloji',      icon: '◉' },
+  { slug: 'sonstiges',   de: 'Sonstiges',     tr: 'Diğer',          icon: '◇' }
+];
 
 // Practice state
 let practiceSession = null;
@@ -1202,10 +1522,49 @@ function loadWords() { return load(STORE_WORDS); }
 function saveWords(d) { save(STORE_WORDS, d); }
 function loadVerbs() { return load(STORE_VERBS); }
 function saveVerbs(d) { save(STORE_VERBS, d); }
+function loadAdj() { return load(STORE_ADJ); }
+function saveAdj(d) { save(STORE_ADJ, d); }
 
-function currentStoreKey() { return currentView === 'verbs' ? STORE_VERBS : STORE_WORDS; }
+function currentStoreKey() {
+  if (currentView === 'verbs') return STORE_VERBS;
+  if (currentView === 'adj')   return STORE_ADJ;
+  return STORE_WORDS;
+}
 function currentLoad() { return load(currentStoreKey()); }
 function currentSave(d) { save(currentStoreKey(), d); }
+
+// ─── Artikel coloring helper ───
+function renderDeWithArtikel(de) {
+  if (!de) return '';
+  const escaped = esc(de);
+  // Match leading der/die/das (case-insensitive) followed by space
+  const m = escaped.match(/^(der|die|das)(\s+)(.+)$/i);
+  if (m) {
+    const a = m[1].toLowerCase();
+    return `<span class="artikel-${a}">${m[1]}</span>${m[2]}${m[3]}`;
+  }
+  return escaped;
+}
+
+// ─── Get all unique custom categories the user has used ───
+function getAllUsedCategories() {
+  const all = new Set();
+  [loadWords(), loadVerbs(), loadAdj()].forEach(store => {
+    Object.values(store).flat().forEach(item => {
+      if (item.cats && Array.isArray(item.cats)) {
+        item.cats.forEach(c => all.add(c));
+      }
+    });
+  });
+  return Array.from(all);
+}
+
+// ─── Get category meta (icon, label) ───
+function getCategoryMeta(slug) {
+  const preset = PRESET_CATEGORIES.find(c => c.slug === slug);
+  if (preset) return preset;
+  return { slug, de: slug, tr: slug, icon: '#' };
+}
 
 function showNotif(msg) {
   const n = document.getElementById('notif');
@@ -1232,11 +1591,14 @@ function esc(s) {
 // ═══════════════════════════════════════════════════════════════
 function switchView(view) {
   currentView = view;
+  categoryFilter = null; // reset category filter on view change
   document.querySelectorAll('.nav-btn').forEach(b => {
     b.classList.toggle('active', b.dataset.view === view);
     b.classList.toggle('verbs', view === 'verbs');
+    b.classList.toggle('adj', view === 'adj');
   });
   document.body.classList.toggle('verbs-mode', view === 'verbs');
+  document.body.classList.toggle('adj-mode', view === 'adj');
 
   if (view === 'practice') {
     renderPracticeSetup();
@@ -1251,21 +1613,48 @@ function switchView(view) {
 // ═══════════════════════════════════════════════════════════════
 function renderListView() {
   const isVerbs = currentView === 'verbs';
-  const labelDe = isVerbs ? 'Verb (Infinitiv)' : 'German';
-  const placeholderDe = isVerbs ? 'sprechen' : 'der Hund';
-  const placeholderTr = isVerbs ? 'konuşmak' : 'köpek';
-  const placeholderEx = isVerbs ? 'Ich spreche Deutsch.' : 'Der Hund läuft schnell.';
-  const placeholderExTr = isVerbs ? 'Ben Almanca konuşuyorum.' : 'Köpek hızlı koşuyor.';
-  const formTitle = isVerbs ? 'New Verb' : 'New Word';
-  const modeBadge = isVerbs ? 'Verbs' : 'Words';
+  const isAdj   = currentView === 'adj';
+
+  let labelDe, placeholderDe, placeholderTr, placeholderEx, placeholderExTr, formTitle, modeBadge, badgeClass, subtitle;
+  if (isVerbs) {
+    labelDe = 'Verb (Infinitiv)';
+    placeholderDe = 'sprechen';
+    placeholderTr = 'konuşmak';
+    placeholderEx = 'Ich spreche Deutsch.';
+    placeholderExTr = 'Ben Almanca konuşuyorum.';
+    formTitle = 'New Verb';
+    modeBadge = 'Verbs';
+    badgeClass = 'verbs';
+    subtitle = 'Verb Journal';
+  } else if (isAdj) {
+    labelDe = 'Adjective';
+    placeholderDe = 'schön';
+    placeholderTr = 'güzel';
+    placeholderEx = 'Das Haus ist schön.';
+    placeholderExTr = 'Ev güzel.';
+    formTitle = 'New Adjective';
+    modeBadge = 'Adjectives';
+    badgeClass = 'adj';
+    subtitle = 'Adjective Journal';
+  } else {
+    labelDe = 'German';
+    placeholderDe = 'der Hund';
+    placeholderTr = 'köpek';
+    placeholderEx = 'Der Hund läuft schnell.';
+    placeholderExTr = 'Köpek hızlı koşuyor.';
+    formTitle = 'New Word';
+    modeBadge = 'Words';
+    badgeClass = '';
+    subtitle = 'Vocabulary Journal';
+  }
 
   const html = `
     <div class="page-header">
       <div>
         <div class="page-date">${fmtDateLong(todayKey())}</div>
-        <div class="page-subtitle">${isVerbs ? 'Verb Journal' : 'Vocabulary Journal'}</div>
+        <div class="page-subtitle">${subtitle}</div>
       </div>
-      <div class="mode-badge ${isVerbs ? 'verbs' : ''}">${modeBadge}</div>
+      <div class="mode-badge ${badgeClass}">${modeBadge}</div>
     </div>
 
     <div class="add-card">
@@ -1291,10 +1680,12 @@ function renderListView() {
       <div class="add-row">
         <span class="add-hint">↵ Enter to move between fields, then add</span>
         <div class="add-actions">
-          <button class="btn btn-primary" onclick="addItem()">+ Add ${isVerbs ? 'Verb' : 'Word'}</button>
+          <button class="btn btn-primary" onclick="addItem()">+ Add ${isVerbs ? 'Verb' : isAdj ? 'Adjective' : 'Word'}</button>
         </div>
       </div>
     </div>
+
+    <div id="cat-filter-bar-wrap"></div>
 
     <div class="search-bar">
       <input class="search-input" id="search-input" type="text"
@@ -1310,8 +1701,34 @@ function renderListView() {
     <div id="word-list-container"></div>
   `;
   document.getElementById('main-content').innerHTML = html;
+  renderCategoryFilterBar();
   renderWordList();
   setupInputs();
+}
+
+function renderCategoryFilterBar() {
+  const bar = document.getElementById('cat-filter-bar-wrap');
+  if (!bar) return;
+  const data = currentLoad();
+  // Get categories used in current store
+  const usedSlugs = new Set();
+  Object.values(data).flat().forEach(it => {
+    (it.cats || []).forEach(c => usedSlugs.add(c));
+  });
+  if (usedSlugs.size === 0) { bar.innerHTML = ''; return; }
+  const sorted = Array.from(usedSlugs).map(getCategoryMeta).sort((a,b) => a.de.localeCompare(b.de));
+  let h = '<div class="cat-filter-bar">';
+  h += `<button class="cat-filter-chip ${categoryFilter === null ? 'active' : ''}" onclick="setCategoryFilter(null)">All</button>`;
+  sorted.forEach(c => {
+    h += `<button class="cat-filter-chip ${categoryFilter === c.slug ? 'active' : ''}" onclick="setCategoryFilter('${c.slug}')">${c.icon} ${esc(c.de)}</button>`;
+  });
+  h += '</div>';
+  bar.innerHTML = h;
+}
+
+function setCategoryFilter(slug) {
+  categoryFilter = slug;
+  renderListView();
 }
 
 function setupInputs() {
@@ -1345,14 +1762,19 @@ function renderWordList() {
     filteredDays = allDays.filter(d => new Date(d + 'T12:00:00') >= weekAgo);
   }
 
-  // Apply search
+  // Apply search + category filter
   const filtered = filteredDays.map(d => ({
     date: d,
     items: (data[d] || []).filter(w => {
+      // Category filter
+      if (categoryFilter && !(w.cats || []).includes(categoryFilter)) return false;
+      // Search
       if (!searchTerm) return true;
       return (w.de||'').toLowerCase().includes(searchTerm)
           || (w.tr||'').toLowerCase().includes(searchTerm)
-          || (w.ex||'').toLowerCase().includes(searchTerm);
+          || (w.ex||'').toLowerCase().includes(searchTerm)
+          || (w.exTr||'').toLowerCase().includes(searchTerm)
+          || (w.syn||'').toLowerCase().includes(searchTerm);
     })
   })).filter(g => g.items.length > 0);
 
@@ -1361,7 +1783,7 @@ function renderWordList() {
     container.innerHTML = `
       <div class="empty-state">
         <span class="big">✎</span>
-        <p>${searchTerm ? 'No matches found' : `Start adding ${currentView === 'verbs' ? 'verbs' : 'words'} above`}</p>
+        <p>${searchTerm ? 'No matches found' : `Start adding ${currentView === 'verbs' ? 'verbs' : currentView === 'adj' ? 'adjectives' : 'words'} above`}</p>
       </div>`;
     return;
   }
@@ -1372,15 +1794,15 @@ function renderWordList() {
     html += `<div class="day-group">
       <div class="day-header">
         <span class="day-header-date">${isToday ? 'Today' : fmtDate(group.date)}</span>
-        <span class="day-header-count">${group.items.length} ${currentView === 'verbs' ? 'verbs' : 'words'}</span>
+        <span class="day-header-count">${group.items.length} ${currentView === 'verbs' ? 'verbs' : currentView === 'adj' ? 'adjectives' : 'words'}</span>
       </div>
       <div class="word-list">
         ${group.items.map((w, i) => {
           const m = w.mastery || 0;
           const exDisplay = w.ex ? (w.exTr ? `${esc(w.ex)} <span style="opacity:0.55;font-size:14px;">— ${esc(w.exTr)}</span>` : esc(w.ex)) : '—';
-          return `<div class="word-row">
+          return `<div class="word-row" data-date="${group.date}" data-id="${w.id}">
             <div class="word-num">${String(group.items.length - i).padStart(2,'0')}</div>
-            <div class="word-de" title="${esc(w.de)}">${esc(w.de)}</div>
+            <div class="word-de" title="${esc(w.de)}">${renderDeWithArtikel(w.de)}</div>
             <div class="word-tr" title="${esc(w.tr)}">${esc(w.tr)}</div>
             <div class="word-ex" title="${esc(w.ex)}${w.exTr ? ' — ' + esc(w.exTr) : ''}">${exDisplay}</div>
             <div class="mastery" title="Mastery: ${m}/3">
@@ -1397,13 +1819,17 @@ function renderWordList() {
   });
   container.innerHTML = html;
 
-  // wire delete buttons
+  // wire delete buttons (stop propagation so row click doesn't fire)
   container.querySelectorAll('.btn-del').forEach(btn => {
-    btn.onclick = () => deleteItem(btn.dataset.date, btn.dataset.id);
+    btn.onclick = (e) => { e.stopPropagation(); deleteItem(btn.dataset.date, btn.dataset.id); };
   });
   // wire edit buttons
   container.querySelectorAll('.btn-edit').forEach(btn => {
-    btn.onclick = () => openEditModal(btn.dataset.date, btn.dataset.id);
+    btn.onclick = (e) => { e.stopPropagation(); openEditModal(btn.dataset.date, btn.dataset.id); };
+  });
+  // wire row click -> detail modal
+  container.querySelectorAll('.word-row').forEach(row => {
+    row.onclick = () => openDetailModal(row.dataset.date, row.dataset.id);
   });
 }
 
@@ -1412,34 +1838,137 @@ function renderWordList() {
 // ═══════════════════════════════════════════════════════════════
 let editingContext = null; // { date, id, type ('words'|'verbs') }
 
+let editingCats = [];
+
+function findItemAcrossStores(dateKey, id) {
+  const stores = [
+    { type: 'words', data: loadWords() },
+    { type: 'verbs', data: loadVerbs() },
+    { type: 'adj',   data: loadAdj()   }
+  ];
+  for (const s of stores) {
+    if (s.data[dateKey]) {
+      const item = s.data[dateKey].find(w => String(w.id) === String(id));
+      if (item) return { item, type: s.type };
+    }
+  }
+  return null;
+}
+
 function openEditModal(dateKey, id) {
-  // figure out which store the item lives in
-  const wordsData = loadWords();
-  const verbsData = loadVerbs();
-  let item = null, type = null;
-  if (wordsData[dateKey]) {
-    item = wordsData[dateKey].find(w => String(w.id) === String(id));
-    if (item) type = 'words';
-  }
-  if (!item && verbsData[dateKey]) {
-    item = verbsData[dateKey].find(w => String(w.id) === String(id));
-    if (item) type = 'verbs';
-  }
-  if (!item) { showNotif('Could not find item'); return; }
+  const found = findItemAcrossStores(dateKey, id);
+  if (!found) { showNotif('Could not find item'); return; }
+  const { item, type } = found;
 
   editingContext = { date: dateKey, id, type };
-  const isVerbs = type === 'verbs';
-  const labelDe = isVerbs ? 'Verb (Infinitiv)' : 'German';
+  editingCats = [...(item.cats || [])];
 
-  document.getElementById('edit-modal-title').textContent = isVerbs ? 'Edit Verb' : 'Edit Word';
+  const isVerbs = type === 'verbs';
+  const isAdj = type === 'adj';
+  const labelDe = isVerbs ? 'Verb (Infinitiv)' : isAdj ? 'Adjective' : 'German';
+  const titleText = isVerbs ? 'Edit Verb' : isAdj ? 'Edit Adjective' : 'Edit Word';
+
+  document.getElementById('edit-modal-title').textContent = titleText;
   document.getElementById('edit-label-de').textContent = labelDe;
   document.getElementById('edit-de').value = item.de || '';
   document.getElementById('edit-tr').value = item.tr || '';
   document.getElementById('edit-ex').value = item.ex || '';
   document.getElementById('edit-ex-tr').value = item.exTr || '';
+  document.getElementById('edit-syn').value = item.syn || '';
+
+  renderEditCatTags();
+  setupCatInput();
 
   document.getElementById('edit-modal').classList.add('show');
   setTimeout(() => document.getElementById('edit-de').focus(), 50);
+}
+
+function renderEditCatTags() {
+  const row = document.getElementById('edit-cat-row');
+  if (!row) return;
+  // Clear all pills, keep the input
+  Array.from(row.querySelectorAll('.cat-pill')).forEach(p => p.remove());
+  const inp = document.getElementById('edit-cat-input');
+  editingCats.forEach(slug => {
+    const meta = getCategoryMeta(slug);
+    const pill = document.createElement('span');
+    pill.className = 'cat-pill';
+    pill.innerHTML = `${meta.icon} ${esc(meta.de)} <span class="x">×</span>`;
+    pill.onclick = (e) => {
+      e.stopPropagation();
+      editingCats = editingCats.filter(c => c !== slug);
+      renderEditCatTags();
+    };
+    row.insertBefore(pill, inp);
+  });
+}
+
+function setupCatInput() {
+  const inp = document.getElementById('edit-cat-input');
+  const sug = document.getElementById('edit-cat-suggestions');
+  if (!inp || !sug) return;
+
+  const showSuggestions = () => {
+    const q = inp.value.trim().toLowerCase();
+    const used = getAllUsedCategories();
+    // Build candidates: presets + user-used (deduped)
+    const presetSlugs = new Set(PRESET_CATEGORIES.map(c => c.slug));
+    const allCats = [
+      ...PRESET_CATEGORIES,
+      ...used.filter(s => !presetSlugs.has(s)).map(s => ({ slug: s, de: s, tr: s, icon: '#' }))
+    ];
+    // Filter by query, exclude already-selected
+    const filtered = allCats.filter(c =>
+      !editingCats.includes(c.slug) &&
+      (q === '' || c.de.toLowerCase().includes(q) || c.tr.toLowerCase().includes(q) || c.slug.toLowerCase().includes(q))
+    );
+
+    if (filtered.length === 0 && q === '') { sug.style.display = 'none'; return; }
+    sug.style.display = 'block';
+    sug.innerHTML = filtered.slice(0, 8).map(c =>
+      `<div class="cat-suggestion-item" data-slug="${esc(c.slug)}">
+         <span class="icon">${c.icon}</span>
+         <span>${esc(c.de)}</span>
+         <span class="meta">${esc(c.tr)}</span>
+       </div>`
+    ).join('') + (q && !filtered.some(c => c.de.toLowerCase() === q) ?
+      `<div class="cat-suggestion-item" data-custom="${esc(q)}" style="font-style:italic;color:#9a8870;">
+         <span class="icon">+</span>
+         <span>Create "${esc(q)}"</span>
+       </div>` : '');
+
+    sug.querySelectorAll('.cat-suggestion-item').forEach(item => {
+      item.onclick = () => {
+        const slug = item.dataset.slug || item.dataset.custom;
+        if (slug && !editingCats.includes(slug)) {
+          editingCats.push(slug);
+          renderEditCatTags();
+        }
+        inp.value = '';
+        sug.style.display = 'none';
+        inp.focus();
+      };
+    });
+  };
+
+  inp.oninput = showSuggestions;
+  inp.onfocus = showSuggestions;
+  inp.onblur = () => setTimeout(() => { sug.style.display = 'none'; }, 200);
+  inp.onkeydown = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const v = inp.value.trim().toLowerCase();
+      if (v && !editingCats.includes(v)) {
+        editingCats.push(v);
+        renderEditCatTags();
+      }
+      inp.value = '';
+      sug.style.display = 'none';
+    } else if (e.key === 'Backspace' && inp.value === '' && editingCats.length > 0) {
+      editingCats.pop();
+      renderEditCatTags();
+    }
+  };
 }
 
 function closeEditModal() {
@@ -1455,19 +1984,26 @@ function saveEdit() {
   const tr = document.getElementById('edit-tr').value.trim();
   const ex = document.getElementById('edit-ex').value.trim();
   const exTr = document.getElementById('edit-ex-tr').value.trim();
+  const syn = document.getElementById('edit-syn').value.trim();
   if (!de) { document.getElementById('edit-de').focus(); return; }
 
-  const storeKey = type === 'verbs' ? STORE_VERBS : STORE_WORDS;
+  const storeKey = type === 'verbs' ? STORE_VERBS : type === 'adj' ? STORE_ADJ : STORE_WORDS;
   const data = load(storeKey);
   if (!data[date]) { closeEditModal(); return; }
   const idx = data[date].findIndex(w => String(w.id) === String(id));
   if (idx === -1) { closeEditModal(); return; }
 
-  data[date][idx] = { ...data[date][idx], de, tr, ex, exTr };
+  data[date][idx] = {
+    ...data[date][idx],
+    de, tr, ex, exTr,
+    syn,
+    cats: [...editingCats]
+  };
   save(storeKey, data);
 
   closeEditModal();
   renderWordList();
+  renderCategoryFilterBar();
   renderSidebar();
   showNotif('Saved ✓');
 }
@@ -1484,6 +2020,8 @@ function addItem() {
   if (!data[key]) data[key] = [];
   data[key].unshift({
     de, tr, ex, exTr,
+    syn: '',
+    cats: [],
     id: String(Date.now()) + Math.random().toString(36).slice(2,6),
     mastery: 0,
     seenCount: 0,
@@ -1499,7 +2037,7 @@ function addItem() {
 
   renderWordList();
   renderSidebar();
-  showNotif((currentView === 'verbs' ? 'Verb' : 'Word') + ' added ✓');
+  showNotif((currentView === 'verbs' ? 'Verb' : currentView === 'adj' ? 'Adjective' : 'Word') + ' added ✓');
 }
 
 function deleteItem(dateKey, id) {
@@ -1513,19 +2051,114 @@ function deleteItem(dateKey, id) {
   renderSidebar();
 }
 
+
+// ═══════════════════════════════════════════════════════════════
+// DETAIL MODAL (click on word row to expand)
+// ═══════════════════════════════════════════════════════════════
+function openDetailModal(dateKey, id) {
+  const found = findItemAcrossStores(dateKey, id);
+  if (!found) return;
+  const { item, type } = found;
+
+  const isVerbs = type === 'verbs';
+  const isAdj   = type === 'adj';
+  const modeLabel = isVerbs ? 'Verb' : isAdj ? 'Adjective' : 'Word';
+  const modeClass = isVerbs ? 'verbs' : isAdj ? 'adj' : '';
+
+  const m = item.mastery || 0;
+  const synList = (item.syn || '').split(',').map(s => s.trim()).filter(Boolean);
+  const cats = item.cats || [];
+
+  const card = document.getElementById('detail-card-content');
+  card.innerHTML = `
+    <button class="detail-close" onclick="closeDetailModal()">✕</button>
+
+    <div class="detail-mode-tag ${modeClass}">${modeLabel}</div>
+    <div class="detail-de">${renderDeWithArtikel(item.de)}</div>
+    <div class="detail-tr">${esc(item.tr) || '<span style="opacity:0.4;">no translation</span>'}</div>
+
+    ${(item.ex || item.exTr) ? `
+      <div class="detail-section">
+        <div class="detail-section-label">Example Sentence</div>
+        ${item.ex ? `<div class="detail-ex-de">"${esc(item.ex)}"</div>` : ''}
+        ${item.exTr ? `<div class="detail-ex-tr">${esc(item.exTr)}</div>` : ''}
+      </div>
+    ` : ''}
+
+    ${synList.length > 0 ? `
+      <div class="detail-section">
+        <div class="detail-section-label">Synonyme (eş anlamlılar)</div>
+        <div class="detail-syn">
+          ${synList.map(s => `<span class="syn-pill">${esc(s)}</span>`).join('')}
+        </div>
+      </div>
+    ` : ''}
+
+    ${cats.length > 0 ? `
+      <div class="detail-section">
+        <div class="detail-section-label">Categories</div>
+        <div class="detail-cats">
+          ${cats.map(slug => {
+            const meta = getCategoryMeta(slug);
+            return `<span class="cat-pill">${meta.icon} ${esc(meta.de)}</span>`;
+          }).join('')}
+        </div>
+      </div>
+    ` : ''}
+
+    <div class="detail-section">
+      <div class="detail-mastery-row">
+        <div class="detail-mastery-label">Mastery</div>
+        <div class="detail-mastery-dots">
+          <span class="dot ${m>=1?'filled':''}"></span>
+          <span class="dot ${m>=2?'filled':''}"></span>
+          <span class="dot ${m>=3?'filled':''}"></span>
+        </div>
+        <div class="detail-stats">
+          Seen <strong>${item.seenCount || 0}</strong> ·
+          Correct <strong>${item.correctCount || 0}</strong> ·
+          Added <strong>${fmtDate(dateKey)}</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="detail-actions">
+      <button class="btn btn-ghost" onclick="closeDetailModal()">Close</button>
+      <button class="btn btn-primary" onclick="closeDetailModal(); openEditModal('${dateKey}', '${id}');">✎ Edit</button>
+    </div>
+  `;
+
+  document.getElementById('detail-modal').classList.add('show');
+}
+
+function closeDetailModal() {
+  document.getElementById('detail-modal').classList.remove('show');
+}
+
+// Allow ESC key to close any modal
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    if (document.getElementById('detail-modal').classList.contains('show')) closeDetailModal();
+    else if (document.getElementById('edit-modal').classList.contains('show')) closeEditModal();
+    else if (document.getElementById('export-modal').classList.contains('show')) closeExportModal();
+  }
+});
+
 // ═══════════════════════════════════════════════════════════════
 // SIDEBAR STATS
 // ═══════════════════════════════════════════════════════════════
 function renderSidebar() {
   const words = loadWords();
   const verbs = loadVerbs();
+  const adj   = loadAdj();
   const key = todayKey();
 
   const allWordsList = Object.values(words).flat();
   const allVerbsList = Object.values(verbs).flat();
-  const allItems = [...allWordsList, ...allVerbsList];
+  const allAdjList   = Object.values(adj).flat();
+  const allItems = [...allWordsList, ...allVerbsList, ...allAdjList];
 
-  const todayTotal = (words[key] || []).length + (verbs[key] || []).length;
+  const todayTotal = (words[key]||[]).length + (verbs[key]||[]).length + (adj[key]||[]).length;
   document.getElementById('stat-today').textContent = todayTotal;
   document.getElementById('stat-total').textContent = allItems.length;
 
@@ -1535,9 +2168,10 @@ function renderSidebar() {
   // week count
   const weekAgo = new Date(); weekAgo.setDate(weekAgo.getDate() - 7);
   let weekCount = 0;
-  for (const k of new Set([...Object.keys(words), ...Object.keys(verbs)])) {
+  const allKeys = new Set([...Object.keys(words), ...Object.keys(verbs), ...Object.keys(adj)]);
+  for (const k of allKeys) {
     if (new Date(k + 'T12:00:00') >= weekAgo) {
-      weekCount += (words[k] || []).length + (verbs[k] || []).length;
+      weekCount += (words[k]||[]).length + (verbs[k]||[]).length + (adj[k]||[]).length;
     }
   }
   document.getElementById('stat-week').textContent = weekCount;
@@ -1547,14 +2181,14 @@ function renderSidebar() {
   let d = new Date();
   while (true) {
     const sk = d.toISOString().slice(0,10);
-    const hasAny = (words[sk] && words[sk].length > 0) || (verbs[sk] && verbs[sk].length > 0);
+    const hasAny = (words[sk]||[]).length > 0 || (verbs[sk]||[]).length > 0 || (adj[sk]||[]).length > 0;
     if (hasAny) { streak++; d.setDate(d.getDate() - 1); }
     else break;
   }
   document.getElementById('streak-val').textContent = streak;
 
   // day list
-  const allDayKeys = [...new Set([...Object.keys(words), ...Object.keys(verbs)])].sort().reverse().slice(0, 30);
+  const allDayKeys = [...allKeys].sort().reverse().slice(0, 30);
   const dl = document.getElementById('day-list');
   if (allDayKeys.length === 0) {
     dl.innerHTML = '<div style="font-size:11px;color:rgba(245,234,214,0.25);padding:6px 4px">No entries yet</div>';
@@ -1562,11 +2196,13 @@ function renderSidebar() {
     dl.innerHTML = allDayKeys.map(d => {
       const wc = (words[d] || []).length;
       const vc = (verbs[d] || []).length;
+      const ac = (adj[d]   || []).length;
       return `<div class="day-entry">
         <span class="day-entry-date">${fmtDate(d)}</span>
         <span class="day-entry-counts">
           ${wc > 0 ? `<span class="day-count-pill words">${wc}</span>` : ''}
           ${vc > 0 ? `<span class="day-count-pill verbs">${vc}</span>` : ''}
+          ${ac > 0 ? `<span class="day-count-pill adj">${ac}</span>` : ''}
         </span>
       </div>`;
     }).join('');
@@ -1577,7 +2213,7 @@ function renderSidebar() {
 // PRACTICE / FLASHCARDS
 // ═══════════════════════════════════════════════════════════════
 let practiceConfig = {
-  source: 'both',   // 'words' | 'verbs' | 'both'
+  source: 'all',   // 'all' | 'words' | 'verbs' | 'adj'
   range: 'all',     // 'today' | 'week' | 'all' | 'difficult'
   direction: 'de_to_tr' // 'de_to_tr' | 'tr_to_de'
 };
@@ -1595,9 +2231,10 @@ function renderPracticeSetup() {
       <div class="setup-section">
         <div class="setup-label">What to practice</div>
         <div class="option-grid" id="opt-source">
-          <div class="option-btn ${practiceConfig.source === 'both' ? 'selected' : ''}" data-val="both">Both</div>
-          <div class="option-btn ${practiceConfig.source === 'words' ? 'selected' : ''}" data-val="words">Words only</div>
-          <div class="option-btn ${practiceConfig.source === 'verbs' ? 'selected' : ''}" data-val="verbs">Verbs only</div>
+          <div class="option-btn ${practiceConfig.source === 'all' ? 'selected' : ''}" data-val="all">All</div>
+          <div class="option-btn ${practiceConfig.source === 'words' ? 'selected' : ''}" data-val="words">Words</div>
+          <div class="option-btn ${practiceConfig.source === 'verbs' ? 'selected' : ''}" data-val="verbs">Verbs</div>
+          <div class="option-btn ${practiceConfig.source === 'adj' ? 'selected' : ''}" data-val="adj">Adjectives</div>
         </div>
       </div>
 
@@ -1641,8 +2278,9 @@ function renderPracticeSetup() {
 
 function gatherItems(source, range) {
   const sources = [];
-  if (source === 'words' || source === 'both') sources.push(['words', loadWords()]);
-  if (source === 'verbs' || source === 'both') sources.push(['verbs', loadVerbs()]);
+  if (source === 'words' || source === 'all') sources.push(['words', loadWords()]);
+  if (source === 'verbs' || source === 'all') sources.push(['verbs', loadVerbs()]);
+  if (source === 'adj'   || source === 'all') sources.push(['adj',   loadAdj()]);
 
   let items = [];
   sources.forEach(([type, data]) => {
@@ -1740,7 +2378,7 @@ function markAnswer(correct) {
   const item = practiceSession.items[practiceSession.index];
 
   // Update mastery in storage
-  const storeKey = item._type === 'verbs' ? STORE_VERBS : STORE_WORDS;
+  const storeKey = item._type === 'verbs' ? STORE_VERBS : item._type === 'adj' ? STORE_ADJ : STORE_WORDS;
   const data = load(storeKey);
   const list = data[item._date] || [];
   const original = list.find(w => String(w.id) === String(item.id));
@@ -1796,7 +2434,7 @@ function renderPracticeComplete() {
 // ═══════════════════════════════════════════════════════════════
 // EXPORT MODAL
 // ═══════════════════════════════════════════════════════════════
-let exportOpts = { content: 'both', range: 'today', orientation: 'landscape' };
+let exportOpts = { content: 'all', range: 'today', orientation: 'landscape' };
 
 function openExportModal() {
   document.getElementById('export-modal').classList.add('show');
@@ -1819,7 +2457,9 @@ function closeExportModal() { document.getElementById('export-modal').classList.
 function runExport() {
   closeExportModal();
   let contentMode = exportOpts.content;
-  if (contentMode === 'current') contentMode = currentView === 'verbs' ? 'verbs' : 'words';
+  if (contentMode === 'current') {
+    contentMode = currentView === 'verbs' ? 'verbs' : currentView === 'adj' ? 'adj' : 'words';
+  }
   exportPDF(contentMode, exportOpts.range, exportOpts.orientation);
 }
 
@@ -1843,8 +2483,9 @@ async function exportPDF(contentMode, range, orientation) {
   const { jsPDF } = window.jspdf;
   orientation = orientation || 'landscape';
 
-  const wordsData = (contentMode === 'words' || contentMode === 'both') ? filterByRange(loadWords(), range) : {};
-  const verbsData = (contentMode === 'verbs' || contentMode === 'both') ? filterByRange(loadVerbs(), range) : {};
+  const wordsData = (contentMode === 'words' || contentMode === 'all') ? filterByRange(loadWords(), range) : {};
+  const verbsData = (contentMode === 'verbs' || contentMode === 'all') ? filterByRange(loadVerbs(), range) : {};
+  const adjData   = (contentMode === 'adj'   || contentMode === 'all') ? filterByRange(loadAdj(),   range) : {};
 
   const wordsItems = Object.entries(wordsData)
     .sort(([a],[b]) => b.localeCompare(a))
@@ -1852,8 +2493,11 @@ async function exportPDF(contentMode, range, orientation) {
   const verbsItems = Object.entries(verbsData)
     .sort(([a],[b]) => b.localeCompare(a))
     .flatMap(([d, list]) => list.map(w => ({ ...w, _date: d })));
+  const adjItems = Object.entries(adjData)
+    .sort(([a],[b]) => b.localeCompare(a))
+    .flatMap(([d, list]) => list.map(w => ({ ...w, _date: d })));
 
-  if (wordsItems.length === 0 && verbsItems.length === 0) {
+  if (wordsItems.length === 0 && verbsItems.length === 0 && adjItems.length === 0) {
     showNotif('Nothing to export for this selection!');
     return;
   }
@@ -1875,6 +2519,7 @@ async function exportPDF(contentMode, range, orientation) {
   // ───── COLORS & SPACING ─────
   const wordsRGB = [192, 57, 43];
   const verbsRGB = [46, 107, 63];
+  const adjRGB   = [125, 60, 152];
   const inkRGB = [60, 45, 20];
   const mutedRGB = [150, 130, 95];
   const lineRGB = [220, 205, 175];
@@ -2202,9 +2847,11 @@ async function exportPDF(contentMode, range, orientation) {
   }
 
   // ───── Choose mode ─────
-  const twoColumnMode = isLandscape && contentMode === 'both' && wordsItems.length > 0 && verbsItems.length > 0;
+  // Two-column mode: landscape + exactly Words+Verbs combined (no adj)
+  const twoColumnWordsVerbs = isLandscape && contentMode === 'all'
+    && wordsItems.length > 0 && verbsItems.length > 0 && adjItems.length === 0;
 
-  if (twoColumnMode) {
+  if (twoColumnWordsVerbs) {
     renderTwoColumn();
   } else {
     let isFirst = true;
@@ -2216,11 +2863,16 @@ async function exportPDF(contentMode, range, orientation) {
       renderSection(verbsItems, 'Verbs', verbsRGB, true, isFirst);
       isFirst = false;
     }
+    if (adjItems.length > 0) {
+      renderSection(adjItems, 'Adjectives', adjRGB, false, isFirst);
+      isFirst = false;
+    }
   }
 
+  const totalCount = wordsItems.length + verbsItems.length + adjItems.length;
   const fname = `wortschatz-${contentMode}-${range}-${orientation}-${todayKey()}.pdf`;
   doc.save(fname);
-  showNotif('PDF exported ✓ — ' + (wordsItems.length + verbsItems.length) + ' items');
+  showNotif('PDF exported ✓ — ' + totalCount + ' items');
 }
 // ═══════════════════════════════════════════════════════════════
 // BACKUP / RESTORE
@@ -2228,10 +2880,11 @@ async function exportPDF(contentMode, range, orientation) {
 function backupData() {
   const payload = {
     app: 'wortschatz',
-    version: 3,
+    version: 4,
     exportedAt: new Date().toISOString(),
     words: loadWords(),
-    verbs: loadVerbs()
+    verbs: loadVerbs(),
+    adj:   loadAdj()
   };
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
@@ -2259,6 +2912,7 @@ function restoreData(event) {
 
       saveWords(data.words || {});
       saveVerbs(data.verbs || {});
+      saveAdj(data.adj   || {});
       renderSidebar();
       if (currentView !== 'practice') renderListView();
       showNotif('Backup restored ✓');
@@ -2300,5 +2954,11 @@ document.getElementById('edit-modal').addEventListener('click', e => {
 renderListView();
 renderSidebar();
 </script>
+
+<!-- DETAIL MODAL -->
+<div class="detail-modal" id="detail-modal" onclick="if(event.target===this) closeDetailModal()">
+  <div class="detail-card" id="detail-card-content"></div>
+</div>
+
 </body>
 </html>
