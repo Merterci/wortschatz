@@ -900,6 +900,7 @@ function registerFonts(doc) {
     let currentUser = null;
     let firestoreUnsub = null;
     let syncTimeout = null;
+    let writingFromCloud = false; // FLAG: cloud yazarken sync tetiklenmesin
 
     // ── Auth state ──────────────────────────────────────────────
     onAuthStateChanged(auth, user => {
@@ -958,12 +959,16 @@ function registerFonts(doc) {
       firestoreUnsub = onSnapshot(ref, snap => {
         if (!snap.exists()) return;
         const data = snap.data();
-        // Only update localStorage if data differs (avoid feedback loop)
+
         const localWords = localStorage.getItem('wortschatz_words_v3');
         const localVerbs = localStorage.getItem('wortschatz_verbs_v3');
         const cloudWords = JSON.stringify(data.words || {});
         const cloudVerbs = JSON.stringify(data.verbs || {});
+
         let changed = false;
+
+        // FLAG'i set et: bu yazma cloud'dan geliyor, tekrar sync etme
+        writingFromCloud = true;
         if (cloudWords !== localWords) {
           localStorage.setItem('wortschatz_words_v3', cloudWords);
           changed = true;
@@ -972,9 +977,10 @@ function registerFonts(doc) {
           localStorage.setItem('wortschatz_verbs_v3', cloudVerbs);
           changed = true;
         }
+        writingFromCloud = false;
+
         if (changed) {
           renderSidebar();
-          // Re-render list if visible
           if (window.currentView !== 'practice') renderListView();
           showNotif('☁ Synced from cloud');
         }
@@ -1002,12 +1008,13 @@ function registerFonts(doc) {
       }
     };
 
-    // ── Auto-push after every save/delete ───────────────────────
-    // We hook into localStorage writes by wrapping save()
+    // ── Auto-push: kullanıcı kelime eklediğinde tetikle ──────────
+    // writingFromCloud=true ise cloud'dan geliyor — sync tetikleme
     const _origSetItem = localStorage.setItem.bind(localStorage);
     localStorage.setItem = function(key, val) {
       _origSetItem(key, val);
-      if (key === 'wortschatz_words_v3' || key === 'wortschatz_verbs_v3') {
+      if (!writingFromCloud &&
+          (key === 'wortschatz_words_v3' || key === 'wortschatz_verbs_v3')) {
         clearTimeout(syncTimeout);
         syncTimeout = setTimeout(() => window.pushToCloud(), 1500);
       }
