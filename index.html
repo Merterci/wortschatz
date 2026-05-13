@@ -493,14 +493,42 @@ function registerFonts(doc) {
   }
 
   .word-row {
-    display: grid;
-    grid-template-columns: 44px minmax(0, 1.1fr) minmax(0, 1fr) minmax(0, 1.8fr) 80px 32px 32px;
-    align-items: center;
-    column-gap: 14px;
-    padding: 14px 16px 14px 0;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
     border-bottom: 1px solid var(--line);
     transition: background 0.12s;
-    min-height: 54px;
+    min-height: unset;
+  }
+  .word-row-inner {
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr) minmax(0, 0.9fr) minmax(0, 1.6fr) 32px 32px;
+    align-items: center;
+    column-gap: 14px;
+    padding: 12px 16px 10px 0;
+  }
+  .word-row-bottom {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 14px 10px 58px;
+    flex-wrap: wrap;
+  }
+  .word-syn-preview {
+    font-family: 'Caveat', cursive;
+    font-size: 14px;
+    color: #9a8870;
+    font-style: italic;
+  }
+  .word-syn-preview::before { content: "≈ "; opacity: 0.6; }
+  .word-cat-chip {
+    font-size: 10px;
+    background: var(--tag-bg);
+    color: #6b5530;
+    padding: 2px 8px;
+    border-radius: 99px;
+    border: 1px solid #d4c5a5;
+    letter-spacing: 0.3px;
   }
   .word-row:last-child { border-bottom: none; }
   .word-row:hover { background: var(--hover); }
@@ -861,23 +889,22 @@ function registerFonts(doc) {
     .main { padding: 28px 20px 50px; }
     .fields { grid-template-columns: 1fr; }
     .fields-grid { grid-template-columns: 1fr; }
-    .word-row {
-      grid-template-columns: 32px minmax(0,1fr) 28px 28px;
+    .word-row-inner {
+      grid-template-columns: 32px minmax(0,1fr) 26px 26px;
       grid-template-areas:
         "num de   edit del"
         "num tr   edit del"
-        "num ex   edit del"
-        "num mast edit del";
+        "num ex   edit del";
       column-gap: 10px;
       row-gap: 4px;
     }
+    .word-row-bottom { padding-left: 40px; }
     .word-num { grid-area: num; padding: 4px 0; border-right: none; border-bottom: 1px solid var(--line); }
     .word-de { grid-area: de; }
     .word-tr { grid-area: tr; }
     .word-ex { grid-area: ex; }
-    .mastery { grid-area: mast; justify-content: flex-start; }
-    .btn-edit { grid-area: edit; align-self: center; }
-    .btn-del { grid-area: del; align-self: center; }
+    .btn-edit { grid-area: edit; align-self: start; margin-top: 6px; }
+    .btn-del  { grid-area: del;  align-self: start; margin-top: 6px; }
   }
 
   body.adj-mode .field-input.de { color: var(--adj-accent); }
@@ -891,10 +918,10 @@ function registerFonts(doc) {
   .nav-btn.active.adj { background: var(--adj-accent); }
   .mode-badge.adj { background: var(--adj-accent); }
 
-  /* Artikel highlight inside word-de */
-  .artikel-der { color: var(--der-color); font-weight: 700; }
-  .artikel-die { color: var(--die-color); font-weight: 700; }
-  .artikel-das { color: var(--das-color); font-weight: 700; }
+  /* Artikel: entire word colored */
+  .artikel-der { color: var(--der-color) !important; }
+  .artikel-die { color: var(--die-color) !important; }
+  .artikel-das { color: var(--das-color) !important; }
 
   /* Clickable word row */
   .word-row { cursor: pointer; }
@@ -1534,15 +1561,18 @@ function currentLoad() { return load(currentStoreKey()); }
 function currentSave(d) { save(currentStoreKey(), d); }
 
 // ─── Artikel coloring helper ───
+function getArtikelClass(de) {
+  if (!de) return '';
+  const m = de.trim().match(/^(der|die|das)\s/i);
+  if (!m) return '';
+  return 'artikel-' + m[1].toLowerCase();
+}
+
 function renderDeWithArtikel(de) {
   if (!de) return '';
   const escaped = esc(de);
-  // Match leading der/die/das (case-insensitive) followed by space
-  const m = escaped.match(/^(der|die|das)(\s+)(.+)$/i);
-  if (m) {
-    const a = m[1].toLowerCase();
-    return `<span class="artikel-${a}">${m[1]}</span>${m[2]}${m[3]}`;
-  }
+  const cls = getArtikelClass(de);
+  if (cls) return `<span class="${cls}">${escaped}</span>`;
   return escaped;
 }
 
@@ -1669,15 +1699,34 @@ function renderListView() {
           <input id="inp-tr" class="field-input tr" placeholder="${placeholderTr}" autocomplete="off">
         </div>
         <div class="field-group">
-          <span class="field-label">Example Sentence (German)</span>
+          <span class="field-label">Example (German)</span>
           <input id="inp-ex" class="field-input ex" placeholder="${placeholderEx}" autocomplete="off">
         </div>
         <div class="field-group">
-          <span class="field-label">Example Sentence (Turkish)</span>
+          <span class="field-label">Example (Turkish)</span>
           <input id="inp-ex-tr" class="field-input ex-tr" placeholder="${placeholderExTr}" autocomplete="off">
         </div>
       </div>
-      <div class="add-row">
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:14px;">
+        <div class="field-group">
+          <span class="field-label">Synonyme (comma-separated)</span>
+          <input id="inp-syn" class="field-input" autocomplete="off"
+                 placeholder="z.B. hübsch, attraktiv"
+                 style="font-size:17px;color:var(--ink2);">
+        </div>
+        <div class="field-group">
+          <span class="field-label">Categories</span>
+          <div class="cats-input-wrap">
+            <div class="cat-tags-row" id="inp-cat-row" onclick="document.getElementById('inp-cat-input').focus()">
+              <input id="inp-cat-input" type="text" placeholder="Musik, Tiere, Emotionen..." autocomplete="off">
+            </div>
+            <div class="cat-suggestions" id="inp-cat-suggestions" style="display:none;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="add-row" style="margin-top:14px;">
         <span class="add-hint">↵ Enter to move between fields, then add</span>
         <div class="add-actions">
           <button class="btn btn-primary" onclick="addItem()">+ Add ${isVerbs ? 'Verb' : isAdj ? 'Adjective' : 'Word'}</button>
@@ -1732,7 +1781,8 @@ function setCategoryFilter(slug) {
 }
 
 function setupInputs() {
-  const inps = ['inp-de','inp-tr','inp-ex','inp-ex-tr'];
+  addingCats = [];
+  const inps = ['inp-de','inp-tr','inp-ex','inp-ex-tr','inp-syn'];
   inps.forEach((id, i) => {
     const el = document.getElementById(id);
     if (!el) return;
@@ -1744,6 +1794,90 @@ function setupInputs() {
       }
     });
   });
+  setupAddCatInput();
+}
+
+function renderAddCatTags() {
+  const row = document.getElementById('inp-cat-row');
+  if (!row) return;
+  Array.from(row.querySelectorAll('.cat-pill')).forEach(p => p.remove());
+  const inp = document.getElementById('inp-cat-input');
+  addingCats.forEach(slug => {
+    const meta = getCategoryMeta(slug);
+    const pill = document.createElement('span');
+    pill.className = 'cat-pill';
+    pill.innerHTML = `${meta.icon} ${esc(meta.de)} <span class="x">×</span>`;
+    pill.onclick = (e) => {
+      e.stopPropagation();
+      addingCats = addingCats.filter(c => c !== slug);
+      renderAddCatTags();
+    };
+    row.insertBefore(pill, inp);
+  });
+}
+
+function setupAddCatInput() {
+  const inp = document.getElementById('inp-cat-input');
+  const sug = document.getElementById('inp-cat-suggestions');
+  if (!inp || !sug) return;
+
+  const showSuggestions = () => {
+    const q = inp.value.trim().toLowerCase();
+    const used = getAllUsedCategories();
+    const presetSlugs = new Set(PRESET_CATEGORIES.map(c => c.slug));
+    const allCats = [
+      ...PRESET_CATEGORIES,
+      ...used.filter(s => !presetSlugs.has(s)).map(s => ({ slug: s, de: s, tr: s, icon: '#' }))
+    ];
+    const filtered = allCats.filter(c =>
+      !addingCats.includes(c.slug) &&
+      (q === '' || c.de.toLowerCase().includes(q) || c.tr.toLowerCase().includes(q) || c.slug.toLowerCase().includes(q))
+    );
+    if (filtered.length === 0 && q === '') { sug.style.display = 'none'; return; }
+    sug.style.display = 'block';
+    sug.innerHTML = filtered.slice(0, 8).map(c =>
+      `<div class="cat-suggestion-item" data-slug="${esc(c.slug)}">
+         <span class="icon">${c.icon}</span>
+         <span>${esc(c.de)}</span>
+         <span class="meta">${esc(c.tr)}</span>
+       </div>`
+    ).join('') + (q && !filtered.some(c => c.de.toLowerCase() === q) ?
+      `<div class="cat-suggestion-item" data-custom="${esc(q)}" style="font-style:italic;color:#9a8870;">
+         <span class="icon">+</span><span>Create "${esc(q)}"</span>
+       </div>` : '');
+
+    sug.querySelectorAll('.cat-suggestion-item').forEach(item => {
+      item.onclick = () => {
+        const slug = item.dataset.slug || item.dataset.custom;
+        if (slug && !addingCats.includes(slug)) {
+          addingCats.push(slug);
+          renderAddCatTags();
+        }
+        inp.value = '';
+        sug.style.display = 'none';
+        inp.focus();
+      };
+    });
+  };
+
+  inp.oninput = showSuggestions;
+  inp.onfocus = showSuggestions;
+  inp.onblur = () => setTimeout(() => { sug.style.display = 'none'; }, 200);
+  inp.onkeydown = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const v = inp.value.trim().toLowerCase();
+      if (v && !addingCats.includes(v)) {
+        addingCats.push(v);
+        renderAddCatTags();
+      }
+      inp.value = '';
+      sug.style.display = 'none';
+    } else if (e.key === 'Backspace' && inp.value === '' && addingCats.length > 0) {
+      addingCats.pop();
+      renderAddCatTags();
+    }
+  };
 }
 
 function onSearch(val) { searchTerm = val.toLowerCase(); renderWordList(); }
@@ -1796,22 +1930,25 @@ function renderWordList() {
         <span class="day-header-date">${isToday ? 'Today' : fmtDate(group.date)}</span>
         <span class="day-header-count">${group.items.length} ${currentView === 'verbs' ? 'verbs' : currentView === 'adj' ? 'adjectives' : 'words'}</span>
       </div>
-      <div class="word-list">
-        ${group.items.map((w, i) => {
+      <div class="word-list">        ${group.items.map((w, i) => {
           const m = w.mastery || 0;
-          const exDisplay = w.ex ? (w.exTr ? `${esc(w.ex)} <span style="opacity:0.55;font-size:14px;">— ${esc(w.exTr)}</span>` : esc(w.ex)) : '—';
+          const exDisplay = w.ex ? (w.exTr ? `${esc(w.ex)} <span style="opacity:0.55;font-size:13px;">— ${esc(w.exTr)}</span>` : esc(w.ex)) : '—';
+          const synParts = (w.syn||'').split(',').map(s=>s.trim()).filter(Boolean).slice(0,4);
+          const cats = (w.cats||[]).slice(0,5);
+          const hasBottom = synParts.length > 0 || cats.length > 0;
           return `<div class="word-row" data-date="${group.date}" data-id="${w.id}">
-            <div class="word-num">${String(group.items.length - i).padStart(2,'0')}</div>
-            <div class="word-de" title="${esc(w.de)}">${renderDeWithArtikel(w.de)}</div>
-            <div class="word-tr" title="${esc(w.tr)}">${esc(w.tr)}</div>
-            <div class="word-ex" title="${esc(w.ex)}${w.exTr ? ' — ' + esc(w.exTr) : ''}">${exDisplay}</div>
-            <div class="mastery" title="Mastery: ${m}/3">
-              <span class="dot ${m>=1?'filled':''}"></span>
-              <span class="dot ${m>=2?'filled':''}"></span>
-              <span class="dot ${m>=3?'filled':''}"></span>
+            <div class="word-row-inner">
+              <div class="word-num">${String(group.items.length - i).padStart(2,'0')}</div>
+              <div class="word-de" title="${esc(w.de)}">${renderDeWithArtikel(w.de)}</div>
+              <div class="word-tr" title="${esc(w.tr)}">${esc(w.tr)}</div>
+              <div class="word-ex" title="${esc(w.ex)}${w.exTr?' — '+esc(w.exTr):''}">${exDisplay}</div>
+              <button class="btn-edit" data-date="${group.date}" data-id="${w.id}" title="Edit">✎</button>
+              <button class="btn-del" data-date="${group.date}" data-id="${w.id}" title="Delete">✕</button>
             </div>
-            <button class="btn-edit" data-date="${group.date}" data-id="${w.id}" title="Edit">✎</button>
-            <button class="btn-del" data-date="${group.date}" data-id="${w.id}" title="Delete">✕</button>
+            ${hasBottom ? `<div class="word-row-bottom">
+              ${synParts.length>0 ? `<span class="word-syn-preview">${esc(synParts.join(', '))}</span>` : ''}
+              ${cats.map(slug => { const meta=getCategoryMeta(slug); return `<span class="word-cat-chip">${meta.icon} ${esc(meta.de)}</span>`; }).join('')}
+            </div>` : ''}
           </div>`;
         }).join('')}
       </div>
@@ -1839,6 +1976,7 @@ function renderWordList() {
 let editingContext = null; // { date, id, type ('words'|'verbs') }
 
 let editingCats = [];
+let addingCats = [];  // categories for the add form
 
 function findItemAcrossStores(dateKey, id) {
   const stores = [
@@ -2013,6 +2151,7 @@ function addItem() {
   const tr = document.getElementById('inp-tr').value.trim();
   const ex = document.getElementById('inp-ex').value.trim();
   const exTr = document.getElementById('inp-ex-tr').value.trim();
+  const syn = (document.getElementById('inp-syn') || {}).value?.trim() || '';
   if (!de) { document.getElementById('inp-de').focus(); return; }
 
   const data = currentLoad();
@@ -2020,8 +2159,8 @@ function addItem() {
   if (!data[key]) data[key] = [];
   data[key].unshift({
     de, tr, ex, exTr,
-    syn: '',
-    cats: [],
+    syn,
+    cats: [...addingCats],
     id: String(Date.now()) + Math.random().toString(36).slice(2,6),
     mastery: 0,
     seenCount: 0,
@@ -2033,9 +2172,14 @@ function addItem() {
   document.getElementById('inp-tr').value = '';
   document.getElementById('inp-ex').value = '';
   document.getElementById('inp-ex-tr').value = '';
+  const synEl = document.getElementById('inp-syn');
+  if (synEl) synEl.value = '';
+  addingCats = [];
+  renderAddCatTags();
   document.getElementById('inp-de').focus();
 
   renderWordList();
+  renderCategoryFilterBar();
   renderSidebar();
   showNotif((currentView === 'verbs' ? 'Verb' : currentView === 'adj' ? 'Adjective' : 'Word') + ' added ✓');
 }
@@ -2602,137 +2746,176 @@ async function exportPDF(contentMode, range, orientation) {
   // Row height is computed from actual wrapped line counts. NO OVERLAP.
   // ═══════════════════════════════════════════════════════════════
 
-  function makeCardLayout(x, w, isVerbs) {
-    // Inside the card:
-    //   [num: 10mm] [de+tr stacked or inline] [date: 18mm]
-    const numW = 10;
-    const dateW = 18;
-    const innerLeft = x + numW + 2;
-    const innerRight = x + w - dateW - 2;
-    const innerW = innerRight - innerLeft;
-
-    // Top line: DE | TR (50/50 split)
-    const deW = innerW * 0.50;
-    const trW = innerW * 0.50;
-
-    // Example lines use full inner width
-    return {
-      x, w, isVerbs,
-      numX: x + numW,
-      innerLeft, innerRight, innerW,
-      deX: innerLeft,
-      deW: deW - 4,
-      trX: innerLeft + deW,
-      trW: trW - 4,
-      exX: innerLeft,
-      exW: innerW,
-      dateX: x + w - 2,
-    };
+  // ── Artikel color lookup for PDF ──
+  function getArtikelRGB(de) {
+    if (!de) return null;
+    const m = de.trim().match(/^(der|die|das)\s/i);
+    if (!m) return null;
+    const a = m[1].toLowerCase();
+    if (a === 'der') return [37, 99, 235];   // blue
+    if (a === 'die') return [220, 38, 38];   // red
+    if (a === 'das') return [22, 163, 74];   // green
+    return null;
   }
 
-  // Calculate height of a card row
-  function computeCardHeight(cols, item) {
-    // Top line: max(de wrapped lines, tr wrapped lines)
-    const deLines = fitText(item.de || '', cols.deW, 11);
-    const trLines = fitText(item.tr || '', cols.trW, 10);
-    const topLines = Math.max(deLines.length, trLines.length);
+  // ── Card layout: each item is a self-contained box ──
+  // Layout per card:
+  //   ┌─────────────────────────────────────────────┐
+  //   │ [colored left bar] ARTIKEL  DE WORD   DATE  │
+  //   │                    ≈ SYNONYM                │
+  //   │                    TR MEANING               │
+  //   │                    "Example DE"             │
+  //   │                    Example TR               │
+  //   │                    [cat1] [cat2]            │
+  //   └─────────────────────────────────────────────┘
+  const CARD_PAD_V = 5;     // top/bottom inside card
+  const CARD_PAD_H = 10;    // left inside content (after bar)
+  const CARD_BAR   = 3;     // colored left bar width
+  const CARD_GAP   = 3;     // gap between cards
+  const LINE_DE    = 5.0;
+  const LINE_TR    = 4.5;
+  const LINE_SYN   = 3.8;
+  const LINE_EX    = 3.8;
+  const LINE_CAT   = 3.6;
 
-    // DE example wraps across full inner width
-    const exDeLines = item.ex ? fitText(item.ex, cols.exW, 9) : [];
-    // TR example wraps
-    const exTrLines = item.exTr ? fitText(item.exTr, cols.exW, 9) : [];
+  function computeCardHeight(colW, item) {
+    const contentW = colW - CARD_BAR - CARD_PAD_H - 22; // 22 for date col
+    const splitW = contentW * 0.55; // de uses 55% of content width
 
-    // Heights in mm
-    const topH = topLines * 4.8;
-    const exDeH = exDeLines.length * 4;
-    const exTrH = exTrLines.length * 4;
+    doc.setFontSize(12); const deH = fitText(item.de||'', splitW, 12).length * LINE_DE;
+    const synParts = (item.syn||'').split(',').map(s=>s.trim()).filter(Boolean);
+    const synH = synParts.length > 0 ? LINE_SYN + 1.5 : 0;
+    doc.setFontSize(10); const trH = fitText(item.tr||'', contentW, 10).length * LINE_TR;
+    doc.setFontSize(9);
+    const exDeH = item.ex   ? fitText(item.ex,   contentW, 9).length * LINE_EX + 1.5 : 0;
+    const exTrH = item.exTr ? fitText(item.exTr, contentW, 9).length * LINE_EX + 1   : 0;
+    const cats = (item.cats||[]).filter(Boolean);
+    const catH = cats.length > 0 ? LINE_CAT + 2 : 0;
 
-    // Gap between top line and examples
-    const exGap = (exDeLines.length > 0 || exTrLines.length > 0) ? 2.5 : 0;
-    // Gap between DE and TR examples
-    const exMidGap = (exDeLines.length > 0 && exTrLines.length > 0) ? 1.5 : 0;
-
-    const total = ROW_PAD_TOP + topH + exGap + exDeH + exMidGap + exTrH + ROW_PAD_BOTTOM;
-    return Math.max(total, 14); // minimum row height
+    const inner = deH + synH + trH + exDeH + exTrH + catH;
+    return Math.max(inner + CARD_PAD_V * 2, 18);
   }
 
-  // Draw a card-style row at y, return y after the row
-  function drawCardRow(cols, item, idx, y, accentRGB) {
-    const h = computeCardHeight(cols, item);
+  function drawCard(colX, colW, item, idx, y, defaultAccentRGB) {
+    const h = computeCardHeight(colW, item);
 
-    // Zebra background
+    // Determine color: artikel takes priority, else section accent
+    const artikelRGB = getArtikelRGB(item.de);
+    const cardColor = artikelRGB || defaultAccentRGB;
+
+    // Card background (alternating very light tint)
     if (idx % 2 === 0) {
-      doc.setFillColor(246, 241, 228);
-      doc.rect(cols.x, y, cols.w, h, 'F');
+      doc.setFillColor(248, 244, 234);
+    } else {
+      doc.setFillColor(253, 251, 246);
     }
+    doc.roundedRect(colX, y, colW, h, 1.5, 1.5, 'F');
 
-    // Bottom separator
-    doc.setDrawColor(225, 210, 175);
-    doc.setLineWidth(0.15);
-    doc.line(cols.x + 2, y + h, cols.x + cols.w - 2, y + h);
+    // Colored left bar
+    doc.setFillColor(...cardColor);
+    doc.roundedRect(colX, y, CARD_BAR, h, 1, 1, 'F');
 
-    let cursorY = y + ROW_PAD_TOP + 3.2;
+    // Card border
+    doc.setDrawColor(220, 208, 180);
+    doc.setLineWidth(0.2);
+    doc.roundedRect(colX, y, colW, h, 1.5, 1.5, 'S');
 
-    // Row number (right-aligned in num column)
-    doc.setFont('DejaVu', 'italic');
-    doc.setFontSize(8);
-    doc.setTextColor(...mutedRGB);
-    doc.text(String(idx + 1).padStart(2, '0'), cols.numX, cursorY, { align: 'right' });
+    const textX = colX + CARD_BAR + CARD_PAD_H;
+    const dateX = colX + colW - 3;
+    const contentW = colX + colW - dateX - 3 + (dateX - textX); // full inner
+    const innerW   = dateX - textX - 3;
 
-    // DE — bold accent
-    const deLines = fitText(item.de || '', cols.deW, 11);
+    let curY = y + CARD_PAD_V + 3.5;
+
+    // ── DE (colored, bold) ──
+    const deW = innerW * 0.60;
     doc.setFont('DejaVu', 'bold');
-    doc.setFontSize(11);
-    doc.setTextColor(...accentRGB);
-    deLines.forEach((line, i) => {
-      doc.text(line, cols.deX, cursorY + i * 4.8);
-    });
+    doc.setFontSize(12);
+    doc.setTextColor(...cardColor);
+    const deLines = fitText(item.de||'', deW, 12);
+    deLines.forEach((line, i) => doc.text(line, textX, curY + i * LINE_DE));
 
-    // TR — italic amber
-    const trLines = fitText(item.tr || '', cols.trW, 10);
-    doc.setFont('DejaVu', 'italic');
-    doc.setFontSize(10);
-    doc.setTextColor(139, 105, 20);
-    trLines.forEach((line, i) => {
-      doc.text(line, cols.trX, cursorY + i * 4.8);
-    });
-
-    // Date (top-right)
+    // ── DATE (top-right, small) ──
     doc.setFont('DejaVu', 'normal');
     doc.setFontSize(7);
     doc.setTextColor(...mutedRGB);
-    doc.text(fmtDate(item._date), cols.dateX, cursorY, { align: 'right' });
+    doc.text(fmtDate(item._date), dateX, curY, { align: 'right' });
 
-    // Advance cursor below the top line
-    const topLines = Math.max(deLines.length, trLines.length);
-    cursorY += topLines * 4.8;
+    curY += deLines.length * LINE_DE;
 
-    // DE example
+    // ── SYNONYM (≈ hübsch, attraktiv) ──
+    const synParts = (item.syn||'').split(',').map(s=>s.trim()).filter(Boolean);
+    if (synParts.length > 0) {
+      curY += 1.5;
+      doc.setFont('DejaVu', 'italic');
+      doc.setFontSize(8);
+      doc.setTextColor(160, 130, 80);
+      const synText = '≈ ' + synParts.join(', ');
+      doc.text(fitText(synText, innerW, 8)[0], textX, curY);
+      curY += LINE_SYN;
+    }
+
+    // ── TR meaning (amber italic) ──
+    curY += 1;
+    doc.setFont('DejaVu', 'italic');
+    doc.setFontSize(10);
+    doc.setTextColor(139, 105, 20);
+    const trLines = fitText(item.tr||'', innerW, 10);
+    trLines.forEach((line, i) => doc.text(line, textX, curY + i * LINE_TR));
+    curY += trLines.length * LINE_TR;
+
+    // ── EXAMPLE DE ──
     if (item.ex) {
-      cursorY += 2.5; // gap
-      const exDeLines = fitText(item.ex, cols.exW, 9);
+      curY += 1.5;
       doc.setFont('DejaVu', 'italic');
-      doc.setFontSize(9);
+      doc.setFontSize(8.5);
       doc.setTextColor(...inkRGB);
-      exDeLines.forEach((line, i) => {
-        doc.text(line, cols.exX, cursorY + i * 4);
-      });
-      cursorY += exDeLines.length * 4;
+      const exLines = fitText('“' + item.ex + '”', innerW, 8.5);
+      exLines.forEach((line, i) => doc.text(line, textX, curY + i * LINE_EX));
+      curY += exLines.length * LINE_EX;
     }
 
-    // TR example
+    // ── EXAMPLE TR ──
     if (item.exTr) {
-      cursorY += (item.ex ? 1.5 : 2.5);
-      const exTrLines = fitText(item.exTr, cols.exW, 9);
+      curY += 1;
       doc.setFont('DejaVu', 'italic');
-      doc.setFontSize(9);
-      doc.setTextColor(110, 85, 30);
-      exTrLines.forEach((line, i) => {
-        doc.text(line, cols.exX, cursorY + i * 4);
+      doc.setFontSize(8.5);
+      doc.setTextColor(120, 90, 40);
+      const exTrLines = fitText(item.exTr, innerW, 8.5);
+      exTrLines.forEach((line, i) => doc.text(line, textX, curY + i * LINE_EX));
+      curY += exTrLines.length * LINE_EX;
+    }
+
+    // ── CATEGORIES ──
+    const cats = (item.cats||[]).filter(Boolean);
+    if (cats.length > 0) {
+      curY += 2;
+      let catX = textX;
+      doc.setFont('DejaVu', 'normal');
+      doc.setFontSize(7.5);
+      cats.slice(0, 5).forEach(slug => {
+        const meta = getCategoryMeta(slug);
+        const label = meta.icon + ' ' + meta.de;
+        doc.setFontSize(7.5);
+        const tw = doc.getTextWidth(label) + 5;
+        // pill background
+        doc.setFillColor(232, 220, 200);
+        doc.roundedRect(catX, curY - 2.5, tw, 4.5, 1, 1, 'F');
+        doc.setTextColor(90, 65, 30);
+        doc.text(label, catX + 2.5, curY + 1.2);
+        catX += tw + 2.5;
+        if (catX > colX + colW - 10) return;
       });
     }
 
-    return y + h;
+    return y + h + CARD_GAP;
+  }
+
+  // ── makeCardLayout just returns colW for backward compat ──
+  function makeCardLayout(x, w, isVerbs) { return { x, w, isVerbs }; }
+  function computeCardHeightCompat(cols, item) { return computeCardHeight(cols.w, item); }
+  function drawCardRow(cols, item, idx, y, accentRGB) {
+    return drawCard(cols.x, cols.w, item, idx, y, accentRGB);
   }
 
   // ───── Render a section full-width on its own pages ─────
