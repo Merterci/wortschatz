@@ -1449,6 +1449,8 @@ function registerFonts(doc) {
       if (user) {
         nameEl.textContent = user.displayName || user.email;
         subEl.textContent  = '☁ Cloud sync ON';
+        const sc = document.getElementById('sync-controls');
+        if (sc) sc.style.display = 'block';
         subEl.style.color  = 'rgba(100,220,130,0.8)';
         btnEl.textContent  = 'Sign out';
         if (user.photoURL) {
@@ -1462,6 +1464,8 @@ function registerFonts(doc) {
         subEl.style.color  = 'rgba(245,234,214,0.4)';
         btnEl.textContent  = 'Sign in';
         avatarEl.innerHTML = '?';
+        const sc = document.getElementById('sync-controls');
+        if (sc) sc.style.display = 'none';
       }
     }
 
