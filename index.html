@@ -875,6 +875,144 @@ function registerFonts(doc) {
     .btn-del { grid-area: del; align-self: center; }
   }
 </style>
+  <!-- Firebase -->
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+    import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
+      from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+    import { getFirestore, doc, getDoc, setDoc, onSnapshot, serverTimestamp }
+      from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyADPZijjZLbYb8Tk4BID8S6_-nbyYvyM9E",
+      authDomain: "wortschatz-91ead.firebaseapp.com",
+      projectId: "wortschatz-91ead",
+      storageBucket: "wortschatz-91ead.firebasestorage.app",
+      messagingSenderId: "471635588972",
+      appId: "1:471635588972:web:2dae4d5cfb9933a07de549"
+    };
+
+    const app   = initializeApp(firebaseConfig);
+    const auth  = getAuth(app);
+    const db    = getFirestore(app);
+    const provider = new GoogleAuthProvider();
+
+    let currentUser = null;
+    let firestoreUnsub = null;
+    let syncTimeout = null;
+
+    // ── Auth state ──────────────────────────────────────────────
+    onAuthStateChanged(auth, user => {
+      currentUser = user;
+      updateAuthUI(user);
+      if (user) {
+        subscribeFirestore(user.uid);
+      } else {
+        if (firestoreUnsub) { firestoreUnsub(); firestoreUnsub = null; }
+      }
+    });
+
+    function updateAuthUI(user) {
+      const nameEl   = document.getElementById('auth-name');
+      const subEl    = document.getElementById('auth-sub');
+      const btnEl    = document.getElementById('auth-btn');
+      const avatarEl = document.getElementById('auth-avatar');
+
+      if (user) {
+        nameEl.textContent = user.displayName || user.email;
+        subEl.textContent  = '☁ Cloud sync ON';
+        subEl.style.color  = 'rgba(100,220,130,0.8)';
+        btnEl.textContent  = 'Sign out';
+        if (user.photoURL) {
+          avatarEl.innerHTML = `<img src="${user.photoURL}" style="width:100%;height:100%;object-fit:cover;">`;
+        } else {
+          avatarEl.textContent = (user.displayName||'U')[0].toUpperCase();
+        }
+      } else {
+        nameEl.textContent = 'Not signed in';
+        subEl.textContent  = 'Local only';
+        subEl.style.color  = 'rgba(245,234,214,0.4)';
+        btnEl.textContent  = 'Sign in';
+        avatarEl.innerHTML = '?';
+      }
+    }
+
+    // ── Auth actions ────────────────────────────────────────────
+    window.handleAuthClick = async () => {
+      if (currentUser) {
+        await signOut(auth);
+        showNotif('Signed out');
+      } else {
+        try {
+          await signInWithPopup(auth, provider);
+        } catch(e) {
+          showNotif('Sign in failed: ' + e.message);
+        }
+      }
+    };
+
+    // ── Firestore: subscribe to cloud data ──────────────────────
+    function subscribeFirestore(uid) {
+      if (firestoreUnsub) firestoreUnsub();
+      const ref = doc(db, 'users', uid, 'data', 'vocab');
+      firestoreUnsub = onSnapshot(ref, snap => {
+        if (!snap.exists()) return;
+        const data = snap.data();
+        // Only update localStorage if data differs (avoid feedback loop)
+        const localWords = localStorage.getItem('wortschatz_words_v3');
+        const localVerbs = localStorage.getItem('wortschatz_verbs_v3');
+        const cloudWords = JSON.stringify(data.words || {});
+        const cloudVerbs = JSON.stringify(data.verbs || {});
+        let changed = false;
+        if (cloudWords !== localWords) {
+          localStorage.setItem('wortschatz_words_v3', cloudWords);
+          changed = true;
+        }
+        if (cloudVerbs !== localVerbs) {
+          localStorage.setItem('wortschatz_verbs_v3', cloudVerbs);
+          changed = true;
+        }
+        if (changed) {
+          renderSidebar();
+          // Re-render list if visible
+          if (window.currentView !== 'practice') renderListView();
+          showNotif('☁ Synced from cloud');
+        }
+      });
+    }
+
+    // ── Firestore: push local data to cloud ─────────────────────
+    window.pushToCloud = async () => {
+      if (!currentUser) return;
+      const syncEl = document.getElementById('sync-status');
+      syncEl.style.display = 'block';
+      syncEl.textContent = '⟳ Syncing...';
+      try {
+        const ref = doc(db, 'users', currentUser.uid, 'data', 'vocab');
+        await setDoc(ref, {
+          words: JSON.parse(localStorage.getItem('wortschatz_words_v3') || '{}'),
+          verbs: JSON.parse(localStorage.getItem('wortschatz_verbs_v3') || '{}'),
+          updatedAt: serverTimestamp()
+        });
+        syncEl.textContent = '✓ Synced';
+        setTimeout(() => { syncEl.style.display = 'none'; }, 2000);
+      } catch(e) {
+        syncEl.textContent = '✗ Sync failed';
+        setTimeout(() => { syncEl.style.display = 'none'; }, 3000);
+      }
+    };
+
+    // ── Auto-push after every save/delete ───────────────────────
+    // We hook into localStorage writes by wrapping save()
+    const _origSetItem = localStorage.setItem.bind(localStorage);
+    localStorage.setItem = function(key, val) {
+      _origSetItem(key, val);
+      if (key === 'wortschatz_words_v3' || key === 'wortschatz_verbs_v3') {
+        clearTimeout(syncTimeout);
+        syncTimeout = setTimeout(() => window.pushToCloud(), 1500);
+      }
+    };
+  </script>
 </head>
 <body>
 
@@ -929,16 +1067,20 @@ function registerFonts(doc) {
     </div>
 
     <div class="sidebar-footer">
-      <button class="footer-btn primary" onclick="openExportModal()">
-        ✦ Export to PDF
-      </button>
+      <!-- AUTH BOX -->
+      <div id="auth-box" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:10px 12px;margin-bottom:8px;display:flex;align-items:center;gap:10px;">
+        <div id="auth-avatar" style="width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;overflow:hidden;">?</div>
+        <div style="flex:1;min-width:0;">
+          <div id="auth-name" style="font-size:11px;color:rgba(245,234,214,0.9);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Not signed in</div>
+          <div id="auth-sub" style="font-size:9px;color:rgba(245,234,214,0.4);letter-spacing:1px;text-transform:uppercase;margin-top:2px;">Local only</div>
+        </div>
+        <button id="auth-btn" onclick="handleAuthClick()" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);color:rgba(245,234,214,0.8);border-radius:6px;padding:5px 9px;font-size:10px;cursor:pointer;white-space:nowrap;font-family:Space Mono,monospace;letter-spacing:0.5px;">Sign in</button>
+      </div>
+      <div id="sync-status" style="display:none;font-size:10px;color:rgba(245,234,214,0.4);text-align:center;margin-bottom:6px;letter-spacing:0.5px;">⟳ Syncing...</div>
+      <button class="footer-btn primary" onclick="openExportModal()">✦ Export to PDF</button>
       <div class="footer-row">
-        <button class="footer-btn secondary" onclick="backupData()" title="Save backup as JSON file">
-          ↓ Backup
-        </button>
-        <button class="footer-btn secondary" onclick="document.getElementById('restore-input').click()" title="Load backup from JSON file">
-          ↑ Restore
-        </button>
+        <button class="footer-btn secondary" onclick="backupData()">↓ Backup</button>
+        <button class="footer-btn secondary" onclick="document.getElementById('restore-input').click()">↑ Restore</button>
       </div>
       <input type="file" id="restore-input" accept=".json" style="display:none" onchange="restoreData(event)">
     </div>
