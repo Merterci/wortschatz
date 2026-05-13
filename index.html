@@ -1562,12 +1562,8 @@ function registerFonts(doc) {
     const _origSetItem = window._origSetItem;
     localStorage.setItem = function(key, val) {
       _origSetItem(key, val);
-      if (!writingFromCloud &&
-          (key === 'wortschatz_words_v3' || key === 'wortschatz_verbs_v3' ||
-           key === 'wortschatz_adj_v3'   || key === 'wortschatz_grammar_v1')) {
-        clearTimeout(syncTimeout);
-        syncTimeout = setTimeout(() => window.pushToCloud(), 1500);
-      }
+      // Auto-sync disabled — user triggers manually or every 10 minutes
+      // (key stored but no immediate cloud push)
     };
   </script>
 </head>
@@ -1635,6 +1631,23 @@ function registerFonts(doc) {
         <button onclick="createGrammarPage()" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);color:rgba(245,234,214,0.9);border-radius:6px;padding:3px 9px;font-size:10px;cursor:pointer;letter-spacing:1px;font-family:Space Mono,monospace;">+ Create</button>
       </div>
       <div id="grammar-page-list"></div>
+    </div>
+
+    <!-- SYNC CONTROLS -->
+    <div id="sync-controls" style="padding:0 8px 8px;display:none;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+        <button id="sync-now-btn" onclick="manualSync()"
+          style="flex:1;background:rgba(180,83,9,0.25);border:1px solid rgba(180,83,9,0.5);
+                 color:rgba(245,234,214,0.9);border-radius:8px;padding:8px;
+                 font-size:10px;letter-spacing:1px;cursor:pointer;
+                 font-family:Space Mono,monospace;transition:all 0.15s;">
+          ↑ Sync Now
+        </button>
+      </div>
+      <div id="sync-status-row" style="font-size:9px;color:rgba(245,234,214,0.35);
+           text-align:center;letter-spacing:0.5px;">
+        Auto-sync every 10 min
+      </div>
     </div>
 
     <div class="sidebar-footer">
@@ -2874,9 +2887,8 @@ function markAnswer(correct) {
 }
 
 function syncAfterPractice() {
-  // Called only when practice session ends
+  // Update sidebar after practice; cloud sync on next manual/interval trigger
   renderSidebar();
-  if (typeof window.pushToCloud === 'function') window.pushToCloud();
 }
 
 function renderPracticeComplete() {
@@ -3489,10 +3501,7 @@ function saveGrammarPages(pages) {
 }
 
 function scheduleGrammarCloudSync() {
-  clearTimeout(grammarSaveTimer);
-  grammarSaveTimer = setTimeout(() => {
-    if (typeof window.pushGrammarToCloud === 'function') window.pushGrammarToCloud();
-  }, 1500);
+  // Grammar sync happens on manual/interval trigger, not per-keystroke
 }
 
 function createGrammarPage() {
@@ -3950,6 +3959,38 @@ async function exportGrammarPDF() {
 
 renderListView();
 renderSidebar();
+
+// ── Manual sync + 10-min auto-sync ──
+function manualSync() {
+  if (typeof window.pushToCloud !== 'function') {
+    updateSyncStatus('Not signed in');
+    return;
+  }
+  updateSyncStatus('Syncing…');
+  const btn = document.getElementById('sync-now-btn');
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Syncing…'; }
+  window.pushToCloud().then(() => {
+    const now = new Date().toLocaleTimeString('tr-TR', {hour:'2-digit',minute:'2-digit'});
+    updateSyncStatus('Last sync: ' + now);
+    if (btn) { btn.disabled = false; btn.textContent = '↑ Sync Now'; }
+  }).catch(() => {
+    updateSyncStatus('Sync failed ✗');
+    if (btn) { btn.disabled = false; btn.textContent = '↑ Sync Now'; }
+  });
+}
+
+function updateSyncStatus(msg) {
+  const el = document.getElementById('sync-status-row');
+  if (el) el.textContent = msg;
+}
+
+// 10-minute auto-sync
+setInterval(() => {
+  if (typeof window.pushToCloud === 'function') {
+    manualSync();
+  }
+}, 10 * 60 * 1000);
+
 </script>
 
 <!-- DETAIL MODAL -->
