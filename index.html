@@ -1167,6 +1167,240 @@ function registerFonts(doc) {
     color: var(--paper);
     border-color: var(--ink);
   }
+
+  :root { --grammar-accent: #b45309; }
+  .nav-btn.active.grammar { background: var(--grammar-accent); }
+  body.grammar-mode .mode-badge { background: var(--grammar-accent); }
+
+  /* ─── A4 EDITOR ─── */
+  .grammar-workspace {
+    display: flex;
+    gap: 0;
+    height: calc(100vh - 140px);
+    min-height: 600px;
+  }
+
+  .grammar-a4 {
+    flex: 1;
+    background: white;
+    box-shadow: 0 4px 32px rgba(0,0,0,0.15);
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    max-width: 794px; /* A4 width at 96dpi */
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .grammar-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: 8px 14px;
+    border-bottom: 1px solid #e5e0d8;
+    background: #faf7f2;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+  }
+
+  .toolbar-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px 8px;
+    border-radius: 5px;
+    font-size: 13px;
+    color: #4a3f2f;
+    transition: background 0.1s;
+    line-height: 1;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-weight: 500;
+  }
+  .toolbar-btn:hover { background: #ede8df; }
+  .toolbar-btn.active { background: #e0d8cc; }
+
+  .toolbar-sep {
+    width: 1px;
+    height: 20px;
+    background: #ddd5c5;
+    margin: 0 4px;
+    flex-shrink: 0;
+  }
+
+  .toolbar-color-btn {
+    width: 22px; height: 22px;
+    border: none; border-radius: 4px;
+    cursor: pointer;
+    transition: transform 0.1s;
+  }
+  .toolbar-color-btn:hover { transform: scale(1.15); }
+
+  .grammar-editor {
+    flex: 1;
+    padding: 48px 72px;
+    overflow-y: auto;
+    outline: none;
+    font-family: 'Georgia', serif;
+    font-size: 15px;
+    line-height: 1.8;
+    color: #1a1209;
+    caret-color: #b45309;
+  }
+
+  .grammar-editor:focus { outline: none; }
+
+  .grammar-editor h1 {
+    font-family: 'Caveat', cursive;
+    font-size: 42px;
+    font-weight: 700;
+    color: #b45309;
+    border-bottom: 2px solid #e8d8b8;
+    padding-bottom: 8px;
+    margin-bottom: 20px;
+    line-height: 1.2;
+  }
+
+  .grammar-editor h2 {
+    font-family: 'Caveat', cursive;
+    font-size: 28px;
+    font-weight: 600;
+    color: #7c3d11;
+    margin-top: 28px;
+    margin-bottom: 10px;
+    line-height: 1.3;
+  }
+
+  .grammar-editor h3 {
+    font-size: 15px;
+    font-weight: 700;
+    color: #4a3f2f;
+    margin-top: 20px;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .grammar-editor p { margin-bottom: 10px; }
+  .grammar-editor ul, .grammar-editor ol {
+    padding-left: 24px;
+    margin-bottom: 12px;
+  }
+  .grammar-editor li { margin-bottom: 4px; }
+
+  .grammar-editor mark { border-radius: 3px; padding: 0 3px; }
+  .grammar-editor .hl-yellow { background: #fef08a; color: #713f12; }
+  .grammar-editor .hl-green  { background: #bbf7d0; color: #14532d; }
+  .grammar-editor .hl-blue   { background: #bfdbfe; color: #1e3a8a; }
+  .grammar-editor .hl-red    { background: #fecaca; color: #7f1d1d; }
+  .grammar-editor .hl-purple { background: #e9d5ff; color: #4c1d95; }
+
+  .grammar-editor table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 16px 0;
+    font-size: 14px;
+  }
+  .grammar-editor table th {
+    background: #f3ead8;
+    padding: 8px 12px;
+    border: 1px solid #d4c8a8;
+    text-align: left;
+    font-weight: 700;
+    color: #4a3f2f;
+  }
+  .grammar-editor table td {
+    padding: 7px 12px;
+    border: 1px solid #d4c8a8;
+  }
+  .grammar-editor table tr:nth-child(even) td { background: #faf7f0; }
+
+  .grammar-editor hr {
+    border: none;
+    border-top: 2px dashed #d4c8a8;
+    margin: 20px 0;
+  }
+
+  .grammar-editor blockquote {
+    border-left: 4px solid #b45309;
+    margin: 14px 0;
+    padding: 8px 16px;
+    background: #fdf6ec;
+    border-radius: 0 6px 6px 0;
+    color: #6b4c2a;
+    font-style: italic;
+  }
+
+  /* placeholder */
+  .grammar-editor:empty::before {
+    content: attr(data-placeholder);
+    color: #c8b898;
+    pointer-events: none;
+  }
+
+  .grammar-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 14px 6px;
+    border-top: 1px solid #e5e0d8;
+    background: #faf7f2;
+    font-size: 10px;
+    color: #9a8870;
+    letter-spacing: 1px;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .grammar-page-item {
+    padding: 8px 10px;
+    border-radius: 7px;
+    cursor: pointer;
+    margin-bottom: 2px;
+    transition: background 0.12s;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+  }
+  .grammar-page-item:hover { background: rgba(255,255,255,0.07); }
+  .grammar-page-item.active { background: rgba(180,83,9,0.3); }
+  .grammar-page-title-text {
+    font-size: 11px;
+    color: var(--sidebar-text);
+    opacity: 0.85;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+  }
+  .grammar-page-del {
+    background: none; border: none; cursor: pointer;
+    color: rgba(245,234,214,0.3); font-size: 13px; padding: 2px 4px;
+    border-radius: 4px; line-height: 1; flex-shrink: 0;
+    transition: all 0.12s;
+  }
+  .grammar-page-del:hover { color: #fca5a5; background: rgba(192,57,43,0.2); }
+
+  .grammar-empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: #b09a7a;
+  }
+  .grammar-empty .big {
+    font-family: 'Caveat Brush', cursive;
+    font-size: 52px;
+    display: block;
+    margin-bottom: 8px;
+    opacity: 0.3;
+    color: #b45309;
+  }
+  .grammar-empty p { font-size: 12px; letter-spacing: 1px; text-transform: uppercase; opacity: 0.6; }
+
 </style>
   <!-- Firebase -->
   <script type="module">
@@ -1263,6 +1497,9 @@ function registerFonts(doc) {
         let changed = false;
 
         // FLAG'i set et: bu yazma cloud'dan geliyor, tekrar sync etme
+        const localGrammar = localStorage.getItem('wortschatz_grammar_v1');
+        const cloudGrammar = JSON.stringify(data.grammar || []);
+
         writingFromCloud = true;
         if (cloudWords !== localWords) {
           localStorage.setItem('wortschatz_words_v3', cloudWords);
@@ -1276,17 +1513,27 @@ function registerFonts(doc) {
           localStorage.setItem('wortschatz_adj_v3', cloudAdj);
           changed = true;
         }
+        if (cloudGrammar !== localGrammar) {
+          localStorage.setItem('wortschatz_grammar_v1', cloudGrammar);
+          changed = true;
+          // refresh grammar sidebar if open
+          if (window.currentView === 'grammar') renderGrammarSidebar();
+        }
         writingFromCloud = false;
 
         if (changed) {
-          renderSidebar();
-          if (window.currentView !== 'practice') renderListView();
+          // Only re-render UI if NOT in practice mode (would destroy the session)
+          if (window.currentView !== 'practice') {
+            renderSidebar();
+            renderListView();
+          }
           showNotif('☁ Synced from cloud');
         }
       });
     }
 
     // ── Firestore: push local data to cloud ─────────────────────
+    window.pushGrammarToCloud = async () => window.pushToCloud();
     window.pushToCloud = async () => {
       if (!currentUser) return;
       const syncEl = document.getElementById('sync-status');
@@ -1295,9 +1542,10 @@ function registerFonts(doc) {
       try {
         const ref = doc(db, 'users', currentUser.uid, 'data', 'vocab');
         await setDoc(ref, {
-          words: JSON.parse(localStorage.getItem('wortschatz_words_v3') || '{}'),
-          verbs: JSON.parse(localStorage.getItem('wortschatz_verbs_v3') || '{}'),
-          adj:   JSON.parse(localStorage.getItem('wortschatz_adj_v3')   || '{}'),
+          words:   JSON.parse(localStorage.getItem('wortschatz_words_v3')  || '{}'),
+          verbs:   JSON.parse(localStorage.getItem('wortschatz_verbs_v3')  || '{}'),
+          adj:     JSON.parse(localStorage.getItem('wortschatz_adj_v3')    || '{}'),
+          grammar: JSON.parse(localStorage.getItem('wortschatz_grammar_v1')|| '[]'),
           updatedAt: serverTimestamp()
         });
         syncEl.textContent = '✓ Synced';
@@ -1310,11 +1558,13 @@ function registerFonts(doc) {
 
     // ── Auto-push: kullanıcı kelime eklediğinde tetikle ──────────
     // writingFromCloud=true ise cloud'dan geliyor — sync tetikleme
-    const _origSetItem = localStorage.setItem.bind(localStorage);
+    window._origSetItem = localStorage.setItem.bind(localStorage);
+    const _origSetItem = window._origSetItem;
     localStorage.setItem = function(key, val) {
       _origSetItem(key, val);
       if (!writingFromCloud &&
-          (key === 'wortschatz_words_v3' || key === 'wortschatz_verbs_v3' || key === 'wortschatz_adj_v3')) {
+          (key === 'wortschatz_words_v3' || key === 'wortschatz_verbs_v3' ||
+           key === 'wortschatz_adj_v3'   || key === 'wortschatz_grammar_v1')) {
         clearTimeout(syncTimeout);
         syncTimeout = setTimeout(() => window.pushToCloud(), 1500);
       }
@@ -1345,6 +1595,9 @@ function registerFonts(doc) {
       <button class="nav-btn" data-view="practice" onclick="switchView('practice')">
         <span class="nav-icon">◎</span> Practice
       </button>
+      <button class="nav-btn" data-view="grammar" onclick="switchView('grammar')">
+        <span class="nav-icon">✦</span> Grammar
+      </button>
     </div>
 
     <div class="streak-badge">
@@ -1374,6 +1627,14 @@ function registerFonts(doc) {
     <div class="sidebar-section">
       <div class="sidebar-section-title">Recent Days</div>
       <div id="day-list"></div>
+    </div>
+
+    <div class="sidebar-section" id="grammar-sidebar-section" style="display:none;">
+      <div class="sidebar-section-title" style="display:flex;align-items:center;justify-content:space-between;">
+        <span>Gramer Konuları</span>
+        <button onclick="createGrammarPage()" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);color:rgba(245,234,214,0.9);border-radius:6px;padding:3px 9px;font-size:10px;cursor:pointer;letter-spacing:1px;font-family:Space Mono,monospace;">+ Create</button>
+      </div>
+      <div id="grammar-page-list"></div>
     </div>
 
     <div class="sidebar-footer">
@@ -1621,17 +1882,25 @@ function esc(s) {
 // ═══════════════════════════════════════════════════════════════
 function switchView(view) {
   currentView = view;
-  categoryFilter = null; // reset category filter on view change
+  categoryFilter = null;
   document.querySelectorAll('.nav-btn').forEach(b => {
     b.classList.toggle('active', b.dataset.view === view);
     b.classList.toggle('verbs', view === 'verbs');
     b.classList.toggle('adj', view === 'adj');
+    b.classList.toggle('grammar', view === 'grammar');
   });
   document.body.classList.toggle('verbs-mode', view === 'verbs');
   document.body.classList.toggle('adj-mode', view === 'adj');
+  document.body.classList.toggle('grammar-mode', view === 'grammar');
+
+  // Show/hide grammar sidebar section
+  const grammarSection = document.getElementById('grammar-sidebar-section');
+  if (grammarSection) grammarSection.style.display = view === 'grammar' ? 'block' : 'none';
 
   if (view === 'practice') {
     renderPracticeSetup();
+  } else if (view === 'grammar') {
+    renderGrammarView();
   } else {
     renderListView();
   }
@@ -2357,9 +2626,10 @@ function renderSidebar() {
 // PRACTICE / FLASHCARDS
 // ═══════════════════════════════════════════════════════════════
 let practiceConfig = {
-  source: 'all',   // 'all' | 'words' | 'verbs' | 'adj'
-  range: 'all',     // 'today' | 'week' | 'all' | 'difficult'
-  direction: 'de_to_tr' // 'de_to_tr' | 'tr_to_de'
+  source: 'all',     // 'all' | 'words' | 'verbs' | 'adj'
+  range: 'all',      // 'today' | 'week' | 'all' | 'difficult'
+  direction: 'de_to_tr', // 'de_to_tr' | 'tr_to_de'
+  category: null     // null = all, or a category slug
 };
 
 function renderPracticeSetup() {
@@ -2400,13 +2670,18 @@ function renderPracticeSetup() {
         </div>
       </div>
 
+      <div class="setup-section" id="opt-category-section">
+        <div class="setup-label">Category filter (optional)</div>
+        <div id="opt-category-chips" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;"></div>
+      </div>
+
       <div class="modal-actions">
         <button class="btn btn-primary" onclick="startPractice()" style="width:100%;padding:14px;">▶ Start Practice</button>
       </div>
     </div>
   `;
 
-  // wire option buttons
+  // wire source/range/direction buttons
   ['opt-source','opt-range','opt-direction'].forEach(groupId => {
     const group = document.getElementById(groupId);
     const key = groupId.replace('opt-','');
@@ -2415,9 +2690,51 @@ function renderPracticeSetup() {
         group.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
         btn.classList.add('selected');
         practiceConfig[key === 'source' ? 'source' : key === 'range' ? 'range' : 'direction'] = btn.dataset.val;
+        // Refresh category chips when source changes
+        renderPracticeCategoryChips();
       };
     });
   });
+
+  renderPracticeCategoryChips();
+}
+
+function renderPracticeCategoryChips() {
+  const wrap = document.getElementById('opt-category-chips');
+  if (!wrap) return;
+
+  // Gather all categories used in current source filter
+  const sources = [];
+  const s = practiceConfig.source;
+  if (s === 'words' || s === 'all') sources.push(loadWords());
+  if (s === 'verbs' || s === 'all') sources.push(loadVerbs());
+  if (s === 'adj'   || s === 'all') sources.push(loadAdj());
+
+  const usedSlugs = new Set();
+  sources.forEach(store => {
+    Object.values(store).flat().forEach(item => {
+      (item.cats || []).forEach(c => usedSlugs.add(c));
+    });
+  });
+
+  if (usedSlugs.size === 0) {
+    wrap.innerHTML = '<span style="font-size:11px;color:#b09a7a;">No categories found for this selection.</span>';
+    return;
+  }
+
+  const sorted = Array.from(usedSlugs).map(getCategoryMeta).sort((a,b) => a.de.localeCompare(b.de));
+  const allBtn = `<button class="cat-filter-chip ${practiceConfig.category === null ? 'active' : ''}"
+    onclick="setPracticeCategory(null)" style="font-size:11px;">All categories</button>`;
+  const chips = sorted.map(c =>
+    `<button class="cat-filter-chip ${practiceConfig.category === c.slug ? 'active' : ''}"
+      onclick="setPracticeCategory('${c.slug}')" style="font-size:11px;">${c.icon} ${esc(c.de)}</button>`
+  ).join('');
+  wrap.innerHTML = allBtn + chips;
+}
+
+function setPracticeCategory(slug) {
+  practiceConfig.category = slug;
+  renderPracticeCategoryChips();
 }
 
 function gatherItems(source, range) {
@@ -2440,6 +2757,11 @@ function gatherItems(source, range) {
     items = items.filter(w => new Date(w._date + 'T12:00:00') >= weekAgo);
   } else if (range === 'difficult') {
     items = items.filter(w => (w.mastery || 0) < 2);
+  }
+
+  // Apply category filter
+  if (practiceConfig.category) {
+    items = items.filter(w => (w.cats || []).includes(practiceConfig.category));
   }
 
   return items;
@@ -2521,7 +2843,8 @@ function markAnswer(correct) {
   if (!practiceSession) return;
   const item = practiceSession.items[practiceSession.index];
 
-  // Update mastery in storage
+  // Update mastery in storage — use raw localStorage to avoid triggering
+  // the Firebase sync loop which would call renderListView and reset the page
   const storeKey = item._type === 'verbs' ? STORE_VERBS : item._type === 'adj' ? STORE_ADJ : STORE_WORDS;
   const data = load(storeKey);
   const list = data[item._date] || [];
@@ -2535,13 +2858,25 @@ function markAnswer(correct) {
     } else {
       original.mastery = Math.max(0, (original.mastery || 0) - 1);
     }
-    save(storeKey, data);
+    // Write directly to localStorage without triggering the override hook
+    // The hook watches for wortschatz_* keys and schedules a cloud sync
+    // which then triggers onSnapshot → renderListView → destroys practice view
+    // Bypass the localStorage override to prevent Firebase sync during practice
+    const rawSet = window._origSetItem || localStorage.setItem.bind(localStorage);
+    rawSet(storeKey, JSON.stringify(data));
   }
 
   practiceSession.index++;
   practiceSession.flipped = false;
   renderPracticeCard();
+  // Defer sidebar update to after practice so stats reflect the session
+  // Do NOT call renderSidebar() here — it triggers Firebase sync → page reset
+}
+
+function syncAfterPractice() {
+  // Called only when practice session ends
   renderSidebar();
+  if (typeof window.pushToCloud === 'function') window.pushToCloud();
 }
 
 function renderPracticeComplete() {
@@ -2573,6 +2908,7 @@ function renderPracticeComplete() {
     </div>
   `;
   practiceSession = null;
+  syncAfterPractice();
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -3133,6 +3469,484 @@ document.addEventListener('keydown', e => {
 document.getElementById('edit-modal').addEventListener('click', e => {
   if (e.target.id === 'edit-modal') closeEditModal();
 });
+
+
+// ═══════════════════════════════════════════════════════════════
+// GRAMMAR PAGES
+// ═══════════════════════════════════════════════════════════════
+const STORE_GRAMMAR = 'wortschatz_grammar_v1';
+let currentGrammarId = null;
+let grammarSaveTimer = null;
+
+function loadGrammarPages() {
+  try { return JSON.parse(localStorage.getItem(STORE_GRAMMAR)) || []; }
+  catch { return []; }
+}
+function saveGrammarPages(pages) {
+  localStorage.setItem(STORE_GRAMMAR, JSON.stringify(pages));
+  // push to Firebase if signed in
+  scheduleGrammarCloudSync();
+}
+
+function scheduleGrammarCloudSync() {
+  clearTimeout(grammarSaveTimer);
+  grammarSaveTimer = setTimeout(() => {
+    if (typeof window.pushGrammarToCloud === 'function') window.pushGrammarToCloud();
+  }, 1500);
+}
+
+function createGrammarPage() {
+  const pages = loadGrammarPages();
+  const newPage = {
+    id: String(Date.now()) + Math.random().toString(36).slice(2,5),
+    title: 'Neues Thema',
+    content: '<h1>Neues Thema</h1><p></p>',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  };
+  pages.unshift(newPage);
+  saveGrammarPages(pages);
+  currentGrammarId = newPage.id;
+  renderGrammarView();
+  renderGrammarSidebar();
+  // Focus title
+  setTimeout(() => {
+    const editor = document.getElementById('grammar-editor');
+    if (editor) {
+      const h1 = editor.querySelector('h1');
+      if (h1) {
+        const range = document.createRange();
+        const sel = window.getSelection();
+        range.selectNodeContents(h1);
+        sel.removeAllRanges();
+        sel.addRange(range);
+        editor.focus();
+      }
+    }
+  }, 100);
+}
+
+function deleteGrammarPage(id) {
+  const pages = loadGrammarPages().filter(p => p.id !== id);
+  saveGrammarPages(pages);
+  if (currentGrammarId === id) {
+    currentGrammarId = pages.length > 0 ? pages[0].id : null;
+  }
+  renderGrammarView();
+  renderGrammarSidebar();
+}
+
+function openGrammarPage(id) {
+  // Save current before switching
+  savePendingGrammar();
+  currentGrammarId = id;
+  renderGrammarView();
+  renderGrammarSidebar();
+}
+
+function savePendingGrammar() {
+  if (!currentGrammarId) return;
+  const editor = document.getElementById('grammar-editor');
+  if (!editor) return;
+  const pages = loadGrammarPages();
+  const idx = pages.findIndex(p => p.id === currentGrammarId);
+  if (idx === -1) return;
+  const rawContent = editor.innerHTML;
+  // Extract title from h1
+  const h1 = editor.querySelector('h1');
+  const title = h1 ? h1.textContent.trim() || 'Untitled' : 'Untitled';
+  pages[idx].content = rawContent;
+  pages[idx].title = title;
+  pages[idx].updatedAt = new Date().toISOString();
+  saveGrammarPages(pages);
+}
+
+// ── Auto-save on input ──
+function onGrammarInput() {
+  clearTimeout(grammarSaveTimer);
+  grammarSaveTimer = setTimeout(() => {
+    savePendingGrammar();
+    renderGrammarSidebar(); // update title in sidebar
+  }, 800);
+
+  // Update save indicator
+  const ind = document.getElementById('grammar-save-indicator');
+  if (ind) { ind.textContent = 'Saving...'; ind.style.color = '#9a8870'; }
+}
+
+function onGrammarSaved() {
+  const ind = document.getElementById('grammar-save-indicator');
+  if (ind) { ind.textContent = 'Saved ✓'; ind.style.color = '#16a34a'; }
+}
+
+// ── Render grammar sidebar list ──
+function renderGrammarSidebar() {
+  const list = document.getElementById('grammar-page-list');
+  if (!list) return;
+  const pages = loadGrammarPages();
+  if (pages.length === 0) {
+    list.innerHTML = '<div style="font-size:11px;color:rgba(245,234,214,0.25);padding:6px 4px 0">No pages yet</div>';
+    return;
+  }
+  list.innerHTML = pages.map(p =>
+    `<div class="grammar-page-item ${p.id === currentGrammarId ? 'active' : ''}"
+          onclick="openGrammarPage('${p.id}')">
+       <span class="grammar-page-title-text">${esc(p.title)}</span>
+       <button class="grammar-page-del" onclick="event.stopPropagation(); if(confirm('Delete this page?')) deleteGrammarPage('${p.id}')" title="Delete">✕</button>
+     </div>`
+  ).join('');
+}
+
+// ── Main grammar view ──
+function renderGrammarView() {
+  const pages = loadGrammarPages();
+  const main = document.getElementById('main-content');
+
+  if (pages.length === 0 || !currentGrammarId) {
+    main.innerHTML = `
+      <div class="page-header">
+        <div>
+          <div class="page-date">Grammar</div>
+          <div class="page-subtitle">Gramer Konuları</div>
+        </div>
+        <div class="mode-badge" style="background:var(--grammar-accent)">Grammar</div>
+      </div>
+      <div class="grammar-empty">
+        <span class="big">✦</span>
+        <p>Create your first grammar page</p>
+        <button class="btn btn-primary" style="margin-top:20px;background:var(--grammar-accent);" onclick="createGrammarPage()">+ Create Page</button>
+      </div>`;
+    renderGrammarSidebar();
+    return;
+  }
+
+  const page = pages.find(p => p.id === currentGrammarId) || pages[0];
+  currentGrammarId = page.id;
+
+  const updTime = new Date(page.updatedAt).toLocaleString('tr-TR', {day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+
+  main.innerHTML = `
+    <div class="page-header" style="margin-bottom:16px;">
+      <div>
+        <div class="page-date">Grammar</div>
+        <div class="page-subtitle">Gramer Konuları</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <button class="btn btn-ghost" onclick="exportGrammarPDF()" style="font-size:10px;padding:8px 14px;">↓ PDF</button>
+        <button class="btn btn-primary" style="font-size:10px;padding:8px 14px;background:var(--grammar-accent);" onclick="createGrammarPage()">+ New Page</button>
+      </div>
+    </div>
+
+    <div class="grammar-a4">
+      <!-- TOOLBAR -->
+      <div class="grammar-toolbar">
+        <button class="toolbar-btn" onclick="gfmt('bold')" title="Bold"><b>B</b></button>
+        <button class="toolbar-btn" onclick="gfmt('italic')" title="Italic"><i>I</i></button>
+        <button class="toolbar-btn" onclick="gfmt('underline')" title="Underline"><u>U</u></button>
+        <div class="toolbar-sep"></div>
+        <button class="toolbar-btn" onclick="gblock('h1')" title="Title">H1</button>
+        <button class="toolbar-btn" onclick="gblock('h2')" title="Heading">H2</button>
+        <button class="toolbar-btn" onclick="gblock('h3')" title="Subheading">H3</button>
+        <button class="toolbar-btn" onclick="gblock('p')" title="Paragraph">¶</button>
+        <div class="toolbar-sep"></div>
+        <button class="toolbar-btn" onclick="gfmt('insertUnorderedList')" title="Bullet list">• List</button>
+        <button class="toolbar-btn" onclick="gfmt('insertOrderedList')" title="Numbered list">1. List</button>
+        <button class="toolbar-btn" onclick="insertBlockquote()" title="Blockquote">❝</button>
+        <button class="toolbar-btn" onclick="insertHR()" title="Divider">—</button>
+        <button class="toolbar-btn" onclick="insertTable()" title="Table">⊞ Table</button>
+        <div class="toolbar-sep"></div>
+        <span style="font-size:10px;color:#9a8870;letter-spacing:1px;margin-right:2px;">Highlight:</span>
+        <button class="toolbar-color-btn" style="background:#fef08a;" onclick="applyHighlight('hl-yellow')" title="Yellow"></button>
+        <button class="toolbar-color-btn" style="background:#bbf7d0;" onclick="applyHighlight('hl-green')" title="Green"></button>
+        <button class="toolbar-color-btn" style="background:#bfdbfe;" onclick="applyHighlight('hl-blue')" title="Blue"></button>
+        <button class="toolbar-color-btn" style="background:#fecaca;" onclick="applyHighlight('hl-red')" title="Red"></button>
+        <button class="toolbar-color-btn" style="background:#e9d5ff;" onclick="applyHighlight('hl-purple')" title="Purple"></button>
+        <button class="toolbar-color-btn" style="background:#f0f0f0;border:1px solid #ccc;" onclick="removeHighlight()" title="Remove highlight">✕</button>
+      </div>
+
+      <!-- EDITOR -->
+      <div class="grammar-editor"
+           id="grammar-editor"
+           contenteditable="true"
+           data-placeholder="Yazmaya başla... H1 başlık, H2 alt başlık, renkli vurgular kullanabilirsin."
+           oninput="onGrammarInput()"
+           onkeydown="onGrammarKeydown(event)"
+           spellcheck="false"
+      >${page.content}</div>
+
+      <!-- META BAR -->
+      <div class="grammar-meta">
+        <span>Last saved: ${updTime}</span>
+        <span id="grammar-save-indicator" style="color:#16a34a;">Saved ✓</span>
+        <span>${page.content.replace(/<[^>]+>/g,'').length} chars</span>
+      </div>
+    </div>
+  `;
+
+  renderGrammarSidebar();
+
+  // Focus editor
+  const editor = document.getElementById('grammar-editor');
+  editor.addEventListener('input', () => {
+    const ind = document.getElementById('grammar-save-indicator');
+    if (ind) ind.textContent = 'Unsaved...';
+  });
+}
+
+// ── Toolbar helpers ──
+function gfmt(cmd) {
+  document.execCommand(cmd, false, null);
+  document.getElementById('grammar-editor').focus();
+}
+
+function gblock(tag) {
+  document.getElementById('grammar-editor').focus();
+  document.execCommand('formatBlock', false, tag);
+}
+
+function applyHighlight(cls) {
+  const sel = window.getSelection();
+  if (!sel.rangeCount || sel.isCollapsed) return;
+  const range = sel.getRangeAt(0);
+  const span = document.createElement('mark');
+  span.className = cls;
+  try {
+    range.surroundContents(span);
+  } catch(e) {
+    // fallback for partial selections
+    const fragment = range.extractContents();
+    span.appendChild(fragment);
+    range.insertNode(span);
+  }
+  sel.removeAllRanges();
+  document.getElementById('grammar-editor').focus();
+  onGrammarInput();
+}
+
+function removeHighlight() {
+  const sel = window.getSelection();
+  if (!sel.rangeCount) return;
+  const range = sel.getRangeAt(0);
+  const marks = document.getElementById('grammar-editor').querySelectorAll('mark');
+  marks.forEach(m => {
+    if (sel.containsNode(m, true)) {
+      const parent = m.parentNode;
+      while (m.firstChild) parent.insertBefore(m.firstChild, m);
+      parent.removeChild(m);
+    }
+  });
+  onGrammarInput();
+}
+
+function insertBlockquote() {
+  document.getElementById('grammar-editor').focus();
+  document.execCommand('formatBlock', false, 'blockquote');
+}
+
+function insertHR() {
+  document.execCommand('insertHTML', false, '<hr><p></p>');
+  document.getElementById('grammar-editor').focus();
+}
+
+function insertTable() {
+  const html = `<table><thead><tr><th>Kolon 1</th><th>Kolon 2</th><th>Kolon 3</th></tr></thead>
+<tbody><tr><td>—</td><td>—</td><td>—</td></tr>
+<tr><td>—</td><td>—</td><td>—</td></tr></tbody></table><p></p>`;
+  document.execCommand('insertHTML', false, html);
+  document.getElementById('grammar-editor').focus();
+  onGrammarInput();
+}
+
+function onGrammarKeydown(e) {
+  // Tab key → insert 4 spaces (don't lose focus)
+  if (e.key === 'Tab') {
+    e.preventDefault();
+    document.execCommand('insertText', false, '    ');
+  }
+  // Ctrl/Cmd+S → force save
+  if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+    e.preventDefault();
+    savePendingGrammar();
+    renderGrammarSidebar();
+    onGrammarSaved();
+    showNotif('Page saved ✓');
+  }
+}
+
+// ── Grammar PDF Export ──
+async function exportGrammarPDF() {
+  savePendingGrammar();
+  const pages = loadGrammarPages();
+  const page = pages.find(p => p.id === currentGrammarId);
+  if (!page) { showNotif('No page to export'); return; }
+
+  const { jsPDF } = window.jspdf;
+  // A4 portrait
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  registerFonts(doc);
+
+  const W = 210, H = 297;
+  const ML = 20, MR = 20, MT = 20, MB = 20;
+  const contentW = W - ML - MR;
+
+  doc.setFillColor(255, 255, 255);
+  doc.rect(0, 0, W, H, 'F');
+
+  // Parse HTML content into lines
+  const tmp = document.createElement('div');
+  tmp.innerHTML = page.content;
+
+  let y = MT;
+  let pageNum = 1;
+
+  function newPage() {
+    doc.addPage([210, 297], 'portrait');
+    pageNum++;
+    doc.setFillColor(255, 255, 255);
+    doc.rect(0, 0, W, H, 'F');
+    y = MT;
+  }
+
+  function checkY(needed) {
+    if (y + needed > H - MB) newPage();
+  }
+
+  function renderNode(node) {
+    const tag = node.nodeName.toLowerCase();
+    const text = node.textContent.trim();
+
+    if (tag === 'h1') {
+      checkY(18);
+      doc.setFont('DejaVu', 'bold');
+      doc.setFontSize(26);
+      doc.setTextColor(180, 83, 9);
+      const lines = doc.splitTextToSize(text, contentW);
+      lines.forEach(line => { checkY(12); doc.text(line, ML, y); y += 11; });
+      // underline
+      doc.setDrawColor(232, 216, 184);
+      doc.setLineWidth(0.5);
+      doc.line(ML, y, W - MR, y);
+      y += 6;
+    } else if (tag === 'h2') {
+      checkY(12);
+      doc.setFont('DejaVu', 'bold');
+      doc.setFontSize(18);
+      doc.setTextColor(124, 61, 17);
+      const lines = doc.splitTextToSize(text, contentW);
+      lines.forEach(line => { checkY(9); doc.text(line, ML, y); y += 8; });
+      y += 2;
+    } else if (tag === 'h3') {
+      checkY(10);
+      doc.setFont('DejaVu', 'bold');
+      doc.setFontSize(12);
+      doc.setTextColor(74, 63, 47);
+      const lines = doc.splitTextToSize(text.toUpperCase(), contentW);
+      lines.forEach(line => { checkY(7); doc.text(line, ML, y); y += 6; });
+      y += 2;
+    } else if (tag === 'p' || tag === 'div') {
+      if (!text) { y += 4; return; }
+      doc.setFont('DejaVu', 'normal');
+      doc.setFontSize(11);
+      doc.setTextColor(30, 20, 10);
+      const lines = doc.splitTextToSize(text, contentW);
+      lines.forEach(line => { checkY(6); doc.text(line, ML, y); y += 5.5; });
+      y += 2;
+    } else if (tag === 'blockquote') {
+      if (!text) return;
+      checkY(10);
+      doc.setFillColor(253, 246, 236);
+      doc.setDrawColor(180, 83, 9);
+      doc.setLineWidth(1);
+      const lines = doc.splitTextToSize(text, contentW - 10);
+      const bqH = lines.length * 5.5 + 8;
+      checkY(bqH);
+      doc.rect(ML, y - 3, contentW, bqH, 'F');
+      doc.line(ML, y - 3, ML, y - 3 + bqH);
+      doc.setFont('DejaVu', 'italic');
+      doc.setFontSize(10.5);
+      doc.setTextColor(107, 76, 42);
+      lines.forEach((line, i) => { doc.text(line, ML + 6, y + i * 5.5); });
+      y += bqH + 2;
+    } else if (tag === 'ul' || tag === 'ol') {
+      const items = node.querySelectorAll('li');
+      items.forEach((li, idx) => {
+        const liText = li.textContent.trim();
+        if (!liText) return;
+        checkY(7);
+        doc.setFont('DejaVu', 'normal');
+        doc.setFontSize(11);
+        doc.setTextColor(30, 20, 10);
+        const bullet = tag === 'ol' ? (idx + 1) + '.' : '•';
+        doc.text(bullet, ML + 2, y);
+        const lines = doc.splitTextToSize(liText, contentW - 12);
+        lines.forEach((line, li) => { checkY(6); doc.text(line, ML + 9, y + li * 5.5); });
+        y += lines.length * 5.5 + 1;
+      });
+      y += 3;
+    } else if (tag === 'table') {
+      const rows = node.querySelectorAll('tr');
+      if (rows.length === 0) return;
+      checkY(10);
+      const colCount = rows[0].querySelectorAll('th,td').length;
+      const colW = contentW / colCount;
+      rows.forEach((row, ri) => {
+        const cells = row.querySelectorAll('th,td');
+        const rowH = 8;
+        checkY(rowH + 2);
+        if (ri === 0) {
+          doc.setFillColor(243, 234, 216);
+        } else {
+          if (ri % 2 === 0) { doc.setFillColor(250, 247, 240); }
+          else { doc.setFillColor(255, 255, 255); }
+        }
+        doc.rect(ML, y - 5, contentW, rowH, 'F');
+        doc.setDrawColor(212, 200, 168);
+        doc.setLineWidth(0.2);
+        doc.rect(ML, y - 5, contentW, rowH, 'S');
+        cells.forEach((cell, ci) => {
+          const cellText = cell.textContent.trim();
+          doc.setFont('DejaVu', ri === 0 ? 'bold' : 'normal');
+          doc.setFontSize(10);
+          doc.setTextColor(74, 63, 47);
+          const lines = doc.splitTextToSize(cellText, colW - 4);
+          doc.text(lines[0] || '', ML + ci * colW + 3, y);
+          // vertical line
+          if (ci > 0) doc.line(ML + ci * colW, y - 5, ML + ci * colW, y + 3);
+        });
+        y += rowH;
+      });
+      y += 4;
+    } else if (tag === 'hr') {
+      checkY(6);
+      doc.setDrawColor(212, 200, 168);
+      doc.setLineWidth(0.5);
+      doc.setLineDashPattern([2,2], 0);
+      doc.line(ML, y, W - MR, y);
+      doc.setLineDashPattern([], 0);
+      y += 5;
+    } else if (node.childNodes && node.childNodes.length > 0) {
+      node.childNodes.forEach(child => { if (child.nodeType === 1) renderNode(child); });
+    }
+  }
+
+  tmp.childNodes.forEach(child => { if (child.nodeType === 1) renderNode(child); });
+
+  // Footer
+  const totalPages = doc.getNumberOfPages();
+  for (let p = 1; p <= totalPages; p++) {
+    doc.setPage(p);
+    doc.setFont('DejaVu', 'italic');
+    doc.setFontSize(8);
+    doc.setTextColor(154, 136, 112);
+    doc.text(esc(page.title) + '  —  Wortschatz Grammar', ML, H - 10);
+    doc.text('Page ' + p + ' / ' + totalPages, W - MR, H - 10, { align: 'right' });
+  }
+
+  const safeName = page.title.replace(/[^a-zA-Z0-9äöüÄÖÜß\s]/g, '').trim().replace(/\s+/g, '_') || 'grammar';
+  doc.save('grammar_' + safeName + '.pdf');
+  showNotif('PDF exported ✓');
+}
+
 
 renderListView();
 renderSidebar();
