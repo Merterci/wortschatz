@@ -1845,6 +1845,7 @@ function registerFonts(doc) {
         <button class="footer-btn secondary" onclick="backupData()">↓ Backup</button>
         <button class="footer-btn secondary" onclick="document.getElementById('restore-input').click()">↑ Restore</button>
       </div>
+      <button class="footer-btn secondary" onclick="exportForVoiceTrainer()" style="margin-top:6px;border-color:rgba(110,168,212,0.4);color:#6ea8d4;">🎙 VoiceTrainer Export</button>
       <input type="file" id="restore-input" accept=".json" style="display:none" onchange="restoreData(event)">
     </div>
   </aside>
@@ -3623,6 +3624,29 @@ function backupData() {
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
   showNotif('Backup downloaded ✓');
+}
+
+function exportForVoiceTrainer() {
+  const payload = {
+    app: 'wortschatz',
+    version: 4,
+    exportedAt: new Date().toISOString(),
+    words: loadWords(),
+    verbs: loadVerbs(),
+    adj:   loadAdj()
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `wortschatz-voicetrainer-${todayKey()}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  const total = Object.values({...loadWords(),...loadVerbs(),...loadAdj()})
+    .reduce((s, d) => s + (typeof d === 'object' ? Object.keys(d).length : 0), 0);
+  showNotif(`VoiceTrainer export indirildi ✓ (${total} kelime)`);
 }
 
 function restoreData(event) {
