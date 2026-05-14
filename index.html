@@ -6,6 +6,7 @@
 <title>Wortschatz — German Learning Companion</title>
 <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Caveat+Brush&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
 <script>
 
 // ─── Embedded DejaVu Sans (Turkish + German support) ───
@@ -272,6 +273,11 @@ function registerFonts(doc) {
     padding: 32px 44px 60px;
     max-width: 100%;
     overflow-x: hidden;
+  }
+  body.graph-mode .main {
+    padding: 0;
+    overflow: hidden;
+    height: 100vh;
   }
 
   .page-header {
@@ -1172,6 +1178,55 @@ function registerFonts(doc) {
   .nav-btn.active.grammar { background: var(--grammar-accent); }
   body.grammar-mode .mode-badge { background: var(--grammar-accent); }
 
+  /* ─── GRAMMAR SUBMENU POPUP ─── */
+  .grammar-submenu {
+    position: fixed;
+    width: 190px;
+    max-height: 60vh;
+    background: #1c1710;
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 10px;
+    box-shadow: 6px 6px 24px rgba(0,0,0,0.5);
+    z-index: 200;
+    display: none;
+    flex-direction: column;
+    padding: 12px 10px;
+    gap: 4px;
+    overflow-y: auto;
+  }
+  .grammar-submenu.open {
+    display: flex;
+  }
+  .grammar-submenu-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(245,234,214,0.45);
+    padding: 0 2px 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    margin-bottom: 4px;
+    flex-shrink: 0;
+  }
+  .grammar-submenu-header button {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: rgba(245,234,214,0.9);
+    border-radius: 6px;
+    padding: 3px 8px;
+    font-size: 10px;
+    cursor: pointer;
+    letter-spacing: 1px;
+    font-family: 'Space Mono', monospace;
+  }
+  .grammar-submenu-header button:hover {
+    background: rgba(180,83,9,0.3);
+    border-color: rgba(180,83,9,0.5);
+  }
+
   /* ─── A4 EDITOR ─── */
   .grammar-workspace {
     display: flex;
@@ -1191,6 +1246,16 @@ function registerFonts(doc) {
     max-width: 794px; /* A4 width at 96dpi */
     margin: 0 auto;
     width: 100%;
+  }
+  .grammar-a4.fullscreen {
+    position: fixed;
+    inset: 0;
+    max-width: 100vw;
+    width: 100vw;
+    height: 100vh;
+    z-index: 500;
+    border-radius: 0;
+    margin: 0;
   }
 
   .grammar-toolbar {
@@ -1401,6 +1466,112 @@ function registerFonts(doc) {
   }
   .grammar-empty p { font-size: 12px; letter-spacing: 1px; text-transform: uppercase; opacity: 0.6; }
 
+  /* ─── GRAPH VIEW ─── */
+  :root {
+    --graph-bg: #080705;
+    --graph-word: #6ea8d4;
+    --graph-verb: #e8a04a;
+    --graph-adj: #6bbf8a;
+    --graph-cat: #b45309;
+    --graph-link-cat: rgba(255,255,255,0.12);
+    --graph-link-manual: #b45309;
+  }
+  .nav-btn.active.graph { background: #4a3a6e; }
+  body.graph-mode .mode-badge { background: #4a3a6e; }
+
+  .graph-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    background: var(--graph-bg);
+    overflow: hidden;
+  }
+  .graph-container svg {
+    width: 100%;
+    height: 100%;
+    cursor: grab;
+  }
+  .graph-container svg:active { cursor: grabbing; }
+  .graph-container.connect-mode svg { cursor: crosshair; }
+
+  .graph-hint {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(20,16,10,0.85);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px;
+    padding: 6px 16px;
+    font-size: 10px;
+    font-family: 'Space Mono', monospace;
+    color: rgba(245,234,214,0.45);
+    letter-spacing: 1px;
+    pointer-events: none;
+    z-index: 10;
+  }
+  .graph-toolbar-float {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+    z-index: 20;
+  }
+  .graph-tool-btn {
+    background: rgba(20,16,10,0.9);
+    border: 1px solid rgba(255,255,255,0.12);
+    color: rgba(245,234,214,0.75);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 10px;
+    font-family: 'Space Mono', monospace;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .graph-tool-btn:hover { background: rgba(40,32,20,0.95); color: #f5ead6; }
+  .graph-tool-btn.active-connect {
+    background: rgba(180,83,9,0.4);
+    border-color: #b45309;
+    color: #f5ead6;
+  }
+  .graph-color-picker {
+    display: none;
+    flex-direction: column;
+    gap: 8px;
+    background: rgba(20,16,10,0.97);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 12px;
+    padding: 12px;
+    width: 170px;
+  }
+  .graph-color-picker.open { display: flex; }
+  .graph-color-swatches {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+  }
+  .graph-swatch {
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 6px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: border-color 0.1s;
+  }
+  .graph-swatch:hover { border-color: rgba(255,255,255,0.6) !important; transform: scale(1.1); }
+  .graph-picker-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: rgba(245,234,214,0.4);
+  }
+
 </style>
   <!-- Firebase -->
   <script type="module">
@@ -1573,6 +1744,15 @@ function registerFonts(doc) {
 </head>
 <body>
 
+<!-- GRAMMAR SUBMENU POPUP -->
+<div class="grammar-submenu" id="grammar-submenu">
+  <div class="grammar-submenu-header">
+    <span>Gramer Konuları</span>
+    <button onclick="createGrammarPage()">+ Yeni</button>
+  </div>
+  <div id="grammar-page-list"></div>
+</div>
+
 <div class="layout">
 
   <!-- SIDEBAR -->
@@ -1597,6 +1777,9 @@ function registerFonts(doc) {
       </button>
       <button class="nav-btn" data-view="grammar" onclick="switchView('grammar')">
         <span class="nav-icon">✦</span> Grammar
+      </button>
+      <button class="nav-btn" data-view="graph" onclick="switchView('graph')">
+        <span class="nav-icon">◈</span> Graph
       </button>
     </div>
 
@@ -1627,14 +1810,6 @@ function registerFonts(doc) {
     <div class="sidebar-section">
       <div class="sidebar-section-title">Recent Days</div>
       <div id="day-list"></div>
-    </div>
-
-    <div class="sidebar-section" id="grammar-sidebar-section" style="display:none;">
-      <div class="sidebar-section-title" style="display:flex;align-items:center;justify-content:space-between;">
-        <span>Gramer Konuları</span>
-        <button onclick="createGrammarPage()" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);color:rgba(245,234,214,0.9);border-radius:6px;padding:3px 9px;font-size:10px;cursor:pointer;letter-spacing:1px;font-family:Space Mono,monospace;">+ Create</button>
-      </div>
-      <div id="grammar-page-list"></div>
     </div>
 
     <!-- SYNC CONTROLS -->
@@ -1910,14 +2085,30 @@ function switchView(view) {
   document.body.classList.toggle('adj-mode', view === 'adj');
   document.body.classList.toggle('grammar-mode', view === 'grammar');
 
-  // Show/hide grammar sidebar section
-  const grammarSection = document.getElementById('grammar-sidebar-section');
-  if (grammarSection) grammarSection.style.display = view === 'grammar' ? 'block' : 'none';
+  // Show/hide grammar submenu popup next to the Grammar button
+  const grammarSubmenu = document.getElementById('grammar-submenu');
+  if (grammarSubmenu) {
+    if (view === 'grammar') {
+      const grammarBtn = document.querySelector('[data-view="grammar"]');
+      if (grammarBtn) {
+        const rect = grammarBtn.getBoundingClientRect();
+        grammarSubmenu.style.top = rect.top + 'px';
+        grammarSubmenu.style.left = (rect.right + 8) + 'px';
+      }
+      grammarSubmenu.classList.add('open');
+    } else {
+      grammarSubmenu.classList.remove('open');
+    }
+  }
+
+  document.body.classList.toggle('graph-mode', view === 'graph');
 
   if (view === 'practice') {
     renderPracticeSetup();
   } else if (view === 'grammar') {
     renderGrammarView();
+  } else if (view === 'graph') {
+    renderGraphView();
   } else {
     renderListView();
   }
@@ -2450,7 +2641,8 @@ function addItem() {
     id: String(Date.now()) + Math.random().toString(36).slice(2,6),
     mastery: 0,
     seenCount: 0,
-    correctCount: 0
+    correctCount: 0,
+    links: []
   });
   currentSave(data);
 
@@ -3592,6 +3784,15 @@ function onGrammarSaved() {
   if (ind) { ind.textContent = 'Saved ✓'; ind.style.color = '#16a34a'; }
 }
 
+function toggleGrammarFullscreen() {
+  const a4 = document.querySelector('.grammar-a4');
+  const btn = document.getElementById('grammar-fs-btn');
+  if (!a4) return;
+  const isFs = a4.classList.toggle('fullscreen');
+  if (btn) btn.textContent = isFs ? '✕ Küçült' : '⛶ Genişlet';
+  if (isFs) document.getElementById('grammar-editor')?.focus();
+}
+
 // ── Render grammar sidebar list ──
 function renderGrammarSidebar() {
   const list = document.getElementById('grammar-page-list');
@@ -3646,6 +3847,7 @@ function renderGrammarView() {
       </div>
       <div style="display:flex;gap:8px;align-items:center;">
         <button class="btn btn-ghost" onclick="exportGrammarPDF()" style="font-size:10px;padding:8px 14px;">↓ PDF</button>
+        <button class="btn btn-ghost" id="grammar-fs-btn" onclick="toggleGrammarFullscreen()" style="font-size:10px;padding:8px 14px;" title="Tam ekran (ESC ile çık)">⛶ Genişlet</button>
         <button class="btn btn-primary" style="font-size:10px;padding:8px 14px;background:var(--grammar-accent);" onclick="createGrammarPage()">+ New Page</button>
       </div>
     </div>
@@ -3783,6 +3985,14 @@ function onGrammarKeydown(e) {
     renderGrammarSidebar();
     onGrammarSaved();
     showNotif('Page saved ✓');
+  }
+  // ESC → fullscreen'den çık
+  if (e.key === 'Escape') {
+    const a4 = document.querySelector('.grammar-a4');
+    if (a4 && a4.classList.contains('fullscreen')) {
+      toggleGrammarFullscreen();
+      e.preventDefault();
+    }
   }
 }
 
@@ -3960,6 +4170,308 @@ async function exportGrammarPDF() {
   showNotif('PDF exported ✓');
 }
 
+// ═══════════════════════════════════════════════════════════════
+// GRAPH VIEW
+// ═══════════════════════════════════════════════════════════════
+let graphConnectMode = null; // word id being connected, or null
+let graphSimulation = null;
+
+function getAllWordsForGraph() {
+  const collect = (storeData, type) => {
+    const items = [];
+    Object.entries(storeData).forEach(([dateKey, dayArr]) => {
+      (dayArr || []).forEach(w => items.push({ ...w, _type: type, _dateKey: dateKey, links: w.links || [] }));
+    });
+    return items;
+  };
+  return [
+    ...collect(loadWords(), 'word'),
+    ...collect(loadVerbs(), 'verb'),
+    ...collect(loadAdj(),   'adj'),
+  ];
+}
+
+function saveWordLinksPatch(wordId, links) {
+  for (const [storeLoader, storeSaver] of [[loadWords, saveWords], [loadVerbs, saveVerbs], [loadAdj, saveAdj]]) {
+    const data = storeLoader();
+    let found = false;
+    Object.keys(data).forEach(day => {
+      data[day] = (data[day] || []).map(w => {
+        if (w.id === wordId) { found = true; return { ...w, links }; }
+        return w;
+      });
+    });
+    if (found) { storeSaver(data); return; }
+  }
+}
+
+function addGraphLink(aId, bId) {
+  const all = getAllWordsForGraph();
+  const a = all.find(w => w.id === aId);
+  const b = all.find(w => w.id === bId);
+  if (!a || !b || aId === bId) return;
+  const aLinks = [...new Set([...(a.links || []), bId])];
+  const bLinks = [...new Set([...(b.links || []), aId])];
+  saveWordLinksPatch(aId, aLinks);
+  saveWordLinksPatch(bId, bLinks);
+}
+
+function removeGraphLink(aId, bId) {
+  const all = getAllWordsForGraph();
+  const a = all.find(w => w.id === aId);
+  const b = all.find(w => w.id === bId);
+  if (a) saveWordLinksPatch(aId, (a.links || []).filter(x => x !== bId));
+  if (b) saveWordLinksPatch(bId, (b.links || []).filter(x => x !== aId));
+}
+
+function renderGraphView() {
+  if (graphSimulation) { graphSimulation.stop(); graphSimulation = null; }
+  graphConnectMode = null;
+
+  // Apply saved colors
+  const _gs = loadGraphSettings();
+  if (_gs.graphBg) document.documentElement.style.setProperty('--graph-bg', _gs.graphBg);
+  if (_gs.graphLink) {
+    document.documentElement.style.setProperty('--graph-link-cat', _gs.graphLink);
+    document.documentElement.style.setProperty('--graph-link-manual', _gs.graphLink);
+  }
+  const savedBg = _gs.graphBg;
+
+  const main = document.getElementById('main-content');
+  main.innerHTML = `
+    <div class="graph-container" id="graph-container">
+      <svg id="graph-svg"></svg>
+      <div class="graph-toolbar-float">
+        <button class="graph-tool-btn" id="graph-connect-toggle" onclick="event.stopPropagation();toggleGraphConnectMode()" title="Bağlantı modu">◎ Bağla</button>
+        <button class="graph-tool-btn" onclick="event.stopPropagation();toggleGraphColorPicker()" title="Arka plan rengi">🎨</button>
+        <div class="graph-color-picker" id="graph-color-picker">
+          <div class="graph-picker-label">Arka Plan</div>
+          <div class="graph-color-swatches">
+            ${['#080705','#0d1117','#1a1a2e','#16213e','#1a0a00','#0a1628','#f5f0e8','#e8ddd0'].map(c =>
+              `<div class="graph-swatch" style="background:${c};border:1px solid rgba(255,255,255,0.15)" onclick="event.stopPropagation();setGraphBg('${c}')" title="${c}"></div>`
+            ).join('')}
+          </div>
+          <input type="color" id="graph-bg-custom" value="${savedBg || '#080705'}"
+            oninput="event.stopPropagation();setGraphBg(this.value)"
+            style="width:100%;height:28px;border:none;border-radius:6px;cursor:pointer;background:none;">
+          <div class="graph-picker-label" style="margin-top:4px">Ok Rengi</div>
+          <div class="graph-color-swatches">
+            ${['#b45309','#6ea8d4','#6bbf8a','#e879f9','#f87171','#facc15','#ffffff','#94a3b8'].map(c =>
+              `<div class="graph-swatch" style="background:${c}" onclick="event.stopPropagation();setGraphLinkColor('${c}')" title="${c}"></div>`
+            ).join('')}
+          </div>
+          <input type="color" id="graph-link-custom" value="${(loadGraphSettings()).graphLink || '#b45309'}"
+            oninput="event.stopPropagation();setGraphLinkColor(this.value)"
+            style="width:100%;height:28px;border:none;border-radius:6px;cursor:pointer;background:none;">
+        </div>
+      </div>
+      <div class="graph-hint">Sürükle • Kaydır yakınlaştır • Kelimeye tıkla</div>
+    </div>`;
+
+  if (typeof d3 === 'undefined') {
+    main.innerHTML = '<div style="color:#f5ead6;padding:40px;font-family:Space Mono,monospace">d3.js yüklenemedi. İnternet bağlantısını kontrol edin.</div>';
+    return;
+  }
+
+  const allWords = getAllWordsForGraph();
+  if (allWords.length === 0) {
+    main.innerHTML = '<div style="color:rgba(245,234,214,0.4);padding:40px;font-family:Space Mono,monospace;text-align:center">Henüz kelime yok.<br>Words/Verbs/Adj görünümlerinden kelime ekle.</div>';
+    return;
+  }
+
+  // Build nodes
+  const usedCatSlugs = new Set(allWords.flatMap(w => w.cats || []));
+  const catNodes = [...usedCatSlugs].map(slug => {
+    const meta = PRESET_CATEGORIES.find(c => c.slug === slug) || { slug, de: slug, icon: '◇' };
+    return { id: 'cat__' + slug, kind: 'cat', label: meta.icon + ' ' + meta.de, slug };
+  });
+  const wordNodes = allWords.map(w => ({
+    id: w.id, kind: 'word', label: w.de, tr: w.tr, cats: w.cats || [],
+    links: w.links || [], _type: w._type, _dateKey: w._dateKey
+  }));
+  const nodes = [...catNodes, ...wordNodes];
+  const nodeById = Object.fromEntries(nodes.map(n => [n.id, n]));
+
+  // Build edges
+  const edges = [];
+  // word → category edges
+  wordNodes.forEach(w => {
+    (w.cats || []).forEach(slug => {
+      if (nodeById['cat__' + slug]) {
+        edges.push({ source: w.id, target: 'cat__' + slug, kind: 'cat' });
+      }
+    });
+  });
+  // manual word–word edges (deduplicate)
+  const manualSeen = new Set();
+  wordNodes.forEach(w => {
+    (w.links || []).forEach(otherId => {
+      const key = [w.id, otherId].sort().join('|');
+      if (!manualSeen.has(key) && nodeById[otherId]) {
+        manualSeen.add(key);
+        edges.push({ source: w.id, target: otherId, kind: 'manual' });
+      }
+    });
+  });
+
+  const container = document.getElementById('graph-container');
+  const W = container.clientWidth || window.innerWidth - 260;
+  const H = container.clientHeight || window.innerHeight;
+
+  const svg = d3.select('#graph-svg')
+    .attr('width', W).attr('height', H);
+
+  const g = svg.append('g');
+
+  // Zoom
+  svg.call(d3.zoom().scaleExtent([0.1, 5]).on('zoom', e => g.attr('transform', e.transform)));
+
+  // Force simulation
+  graphSimulation = d3.forceSimulation(nodes)
+    .force('link', d3.forceLink(edges).id(d => d.id).distance(d => d.kind === 'cat' ? 90 : 60).strength(0.6))
+    .force('charge', d3.forceManyBody().strength(-120))
+    .force('center', d3.forceCenter(W / 2, H / 2))
+    .force('collide', d3.forceCollide(d => d.kind === 'cat' ? 28 : 14));
+
+  // Edges
+  const link = g.append('g').selectAll('line').data(edges).join('line')
+    .attr('stroke', d => d.kind === 'manual' ? 'var(--graph-link-manual)' : 'var(--graph-link-cat)')
+    .attr('stroke-width', d => d.kind === 'manual' ? 2 : 1)
+    .attr('stroke-opacity', d => d.kind === 'manual' ? 0.8 : 0.35)
+    .style('cursor', d => d.kind === 'manual' ? 'pointer' : 'default')
+    .on('click', (event, d) => {
+      if (d.kind !== 'manual') return;
+      event.stopPropagation();
+      if (confirm('Bu bağlantıyı kaldır?')) {
+        removeGraphLink(d.source.id || d.source, d.target.id || d.target);
+        renderGraphView();
+      }
+    });
+
+  // Node circles
+  const nodeColor = d => {
+    if (d.kind === 'cat') return 'var(--graph-cat)';
+    if (d._type === 'verb') return 'var(--graph-verb)';
+    if (d._type === 'adj') return 'var(--graph-adj)';
+    return 'var(--graph-word)';
+  };
+  const nodeR = d => d.kind === 'cat' ? 14 : 7;
+
+  const node = g.append('g').selectAll('g').data(nodes).join('g')
+    .style('cursor', 'pointer')
+    .call(d3.drag()
+      .on('start', (event, d) => {
+        if (!event.active) graphSimulation.alphaTarget(0.3).restart();
+        d.fx = d.x; d.fy = d.y;
+      })
+      .on('drag', (event, d) => { d.fx = event.x; d.fy = event.y; })
+      .on('end', (event, d) => {
+        if (!event.active) graphSimulation.alphaTarget(0);
+        d.fx = null; d.fy = null;
+      })
+    )
+    .on('click', (event, d) => {
+      event.stopPropagation();
+      if (d.kind === 'cat') return;
+      if (graphConnectMode === '__pending__') {
+        // First word selected as source
+        graphConnectMode = d.id;
+        showNotif(`"${d.label}" seçildi — şimdi hedef kelimeye tıkla`);
+        return;
+      }
+      if (graphConnectMode && graphConnectMode !== d.id) {
+        addGraphLink(graphConnectMode, d.id);
+        showNotif('Bağlantı eklendi ✓');
+        setGraphConnectMode(null);
+        renderGraphView();
+        return;
+      }
+      openDetailModal(d._dateKey, d.id);
+    });
+
+  node.append('circle')
+    .attr('r', nodeR)
+    .attr('fill', nodeColor)
+    .attr('fill-opacity', 0.85)
+    .attr('stroke', d => d.kind === 'cat' ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.15)')
+    .attr('stroke-width', 1.5);
+
+  // Labels
+  node.append('text')
+    .text(d => d.label.length > 18 ? d.label.slice(0, 16) + '…' : d.label)
+    .attr('x', d => d.kind === 'cat' ? 0 : 10)
+    .attr('y', d => d.kind === 'cat' ? 4 : 4)
+    .attr('text-anchor', d => d.kind === 'cat' ? 'middle' : 'start')
+    .attr('fill', d => d.kind === 'cat' ? '#f5ead6' : 'rgba(245,234,214,0.75)')
+    .attr('font-size', d => d.kind === 'cat' ? '10px' : '10px')
+    .attr('font-family', 'Space Mono, monospace')
+    .attr('pointer-events', 'none');
+
+  // Tick
+  graphSimulation.on('tick', () => {
+    link
+      .attr('x1', d => d.source.x).attr('y1', d => d.source.y)
+      .attr('x2', d => d.target.x).attr('y2', d => d.target.y);
+    node.attr('transform', d => `translate(${d.x},${d.y})`);
+  });
+
+  // Click on background → exit connect mode, close color picker
+  svg.on('click', () => {
+    setGraphConnectMode(null);
+    const picker = document.getElementById('graph-color-picker');
+    if (picker) picker.classList.remove('open');
+  });
+}
+
+function setGraphConnectMode(wordId) {
+  graphConnectMode = wordId;
+  const container = document.getElementById('graph-container');
+  if (container) container.classList.toggle('connect-mode', !!wordId);
+  const btn = document.getElementById('graph-connect-toggle');
+  if (btn) btn.classList.toggle('active-connect', !!wordId);
+  if (btn) btn.textContent = wordId ? '✕ İptal' : '◎ Bağla';
+}
+
+function toggleGraphConnectMode() {
+  if (graphConnectMode) {
+    setGraphConnectMode(null);
+    showNotif('Bağlantı modu kapatıldı');
+  } else {
+    showNotif('Bağlantı modu açık — bir kelimeye tıkla');
+    const btn = document.getElementById('graph-connect-toggle');
+    if (btn) { btn.classList.add('active-connect'); btn.textContent = '✕ İptal'; }
+    // set a placeholder to activate mode; actual source set on first word click
+    graphConnectMode = '__pending__';
+    const container = document.getElementById('graph-container');
+    if (container) container.classList.add('connect-mode');
+  }
+}
+
+function loadGraphSettings() {
+  try { return JSON.parse(localStorage.getItem('wortschatz_settings') || '{}'); } catch { return {}; }
+}
+function saveGraphSettings(obj) {
+  localStorage.setItem('wortschatz_settings', JSON.stringify({ ...loadGraphSettings(), ...obj }));
+}
+function setGraphBg(color) {
+  document.documentElement.style.setProperty('--graph-bg', color);
+  saveGraphSettings({ graphBg: color });
+  const customInput = document.getElementById('graph-bg-custom');
+  if (customInput) customInput.value = color;
+}
+function setGraphLinkColor(color) {
+  document.documentElement.style.setProperty('--graph-link-cat', color);
+  document.documentElement.style.setProperty('--graph-link-manual', color);
+  saveGraphSettings({ graphLink: color });
+  const customInput = document.getElementById('graph-link-custom');
+  if (customInput) customInput.value = color;
+  // Live update edges in current graph without re-rendering
+  document.querySelectorAll('#graph-svg line').forEach(el => el.setAttribute('stroke', color));
+}
+function toggleGraphColorPicker() {
+  const picker = document.getElementById('graph-color-picker');
+  if (picker) picker.classList.toggle('open');
+}
 
 renderListView();
 renderSidebar();
